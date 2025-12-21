@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,41 +6,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%; /* Midnight Navy */
+    --background: 270 50% 98%; /* Very light lavender/cream */
+    --foreground: 260 25% 15%; /* Deep purple-grey */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 260 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 260 25% 15%;
 
-    --primary: 222 47% 11%; /* Midnight Navy */
-    --primary-foreground: 210 40% 98%;
+    --primary: 265 89% 60%; /* Vibrant Purple */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 320 80% 90%; /* Soft Pink for accents */
+    --secondary-foreground: 320 90% 35%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 260 20% 96%;
+    --muted-foreground: 260 10% 55%;
 
-    --accent: 199 89% 48%; /* Signal Blue */
-    --accent-foreground: 222 47% 11%;
+    --accent: 180 70% 50%; /* Teal/Cyan for playful hits */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222 47% 11%;
+    --border: 260 20% 90%;
+    --input: 260 20% 90%;
+    --ring: 265 89% 60%;
 
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    /* ... keeping it light mode focused for consulting style, but supporting dark technically ... */
+    --radius: 1rem; /* More rounded */
   }
 }
 
@@ -50,21 +44,18 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Outfit', sans-serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
+    @apply font-bold tracking-tight;
   }
 }
 
-.consulting-card {
-  @apply border border-slate-200 shadow-sm bg-white p-6 transition-all hover:shadow-md;
+.playful-card {
+  @apply bg-white border-2 border-slate-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)] hover:shadow-[6px_6px_0px_0px_rgba(99,102,241,0.2)] transition-all duration-300 rounded-2xl;
 }
 
-.consulting-header {
-  @apply font-serif text-3xl font-bold text-primary tracking-tight;
-}
-
-.consulting-label {
-  @apply text-xs font-semibold uppercase tracking-widest text-slate-500;
+.playful-header {
+  @apply text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600;
 }

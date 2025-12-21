@@ -8,19 +8,22 @@ import { Badge } from "@/components/ui/badge";
 
 export const BrandRadarChart = ({ data }) => {
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[350px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-          <PolarGrid stroke="#e2e8f0" />
-          <PolarAngleAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 10 }} />
+        <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
+          <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+          <PolarAngleAxis 
+            dataKey="name" 
+            tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} 
+          />
           <PolarRadiusAxis angle={30} domain={[0, 10]} tick={false} axisLine={false} />
           <Radar
             name="Score"
             dataKey="score"
-            stroke="#0F172A"
-            strokeWidth={2}
-            fill="#0F172A"
-            fillOpacity={0.1}
+            stroke="#8b5cf6"
+            strokeWidth={3}
+            fill="#a78bfa"
+            fillOpacity={0.4}
           />
         </RadarChart>
       </ResponsiveContainer>
@@ -30,28 +33,41 @@ export const BrandRadarChart = ({ data }) => {
 
 export const ScoreCard = ({ title, score, verdict, subtitle }) => {
     let colorClass = "text-slate-900";
-    if (verdict === "GO") colorClass = "text-emerald-600";
-    if (verdict === "CONDITIONAL GO") colorClass = "text-amber-600";
-    if (verdict === "NO-GO" || verdict === "REJECT") colorClass = "text-red-600";
+    let badgeClass = "bg-slate-100 text-slate-700";
+    
+    if (verdict === "GO") {
+        colorClass = "text-emerald-600";
+        badgeClass = "bg-emerald-100 text-emerald-700 border-emerald-200";
+    }
+    if (verdict === "CONDITIONAL GO") {
+        colorClass = "text-amber-600";
+        badgeClass = "bg-amber-100 text-amber-700 border-amber-200";
+    }
+    if (verdict === "NO-GO" || verdict === "REJECT") {
+        colorClass = "text-rose-600";
+        badgeClass = "bg-rose-100 text-rose-700 border-rose-200";
+    }
 
     return (
-        <Card className="border-t-4 border-t-primary shadow-sm h-full">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+        <Card className="playful-card border-l-4 border-l-violet-500 h-full overflow-hidden">
+            <CardHeader className="pb-2 bg-gradient-to-r from-violet-50 to-white">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-violet-400">
                     {title}
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
                 <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl font-serif font-bold text-primary">{score}</span>
-                    <span className="text-sm text-muted-foreground">/100</span>
+                    <span className={`text-5xl font-extrabold ${colorClass}`}>{score}</span>
+                    <span className="text-sm text-slate-400 font-bold">/100</span>
                 </div>
                 {verdict && (
-                    <div className={`mt-2 font-bold ${colorClass}`}>
-                        {verdict}
+                    <div className="mt-3">
+                        <Badge variant="outline" className={`px-3 py-1 text-sm font-bold border-2 ${badgeClass}`}>
+                            {verdict}
+                        </Badge>
                     </div>
                 )}
-                {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
+                {subtitle && <p className="mt-2 text-xs text-slate-400 font-medium">{subtitle}</p>}
             </CardContent>
         </Card>
     );
@@ -59,47 +75,47 @@ export const ScoreCard = ({ title, score, verdict, subtitle }) => {
 
 export const CompetitionAnalysis = ({ data }) => {
     return (
-        <Card className="border-slate-200 shadow-md overflow-hidden">
-            <CardHeader className="bg-slate-900 text-white">
-                <CardTitle className="text-lg font-serif">Competitive Landscape Analysis</CardTitle>
+        <Card className="playful-card border-0 shadow-none ring-1 ring-slate-100 overflow-hidden">
+            <CardHeader className="bg-slate-900 text-white p-6">
+                <CardTitle className="text-xl font-bold flex items-center">
+                    <span className="mr-2">⚔️</span> Competitive Landscape
+                </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-                <div className="p-6 bg-slate-50 border-b border-slate-200">
-                     <h4 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">Competitive White Space</h4>
+                <div className="p-8 bg-gradient-to-br from-violet-50 to-white border-b border-slate-100">
+                     <h4 className="text-xs font-black uppercase tracking-widest text-violet-500 mb-3">✨ Competitive White Space</h4>
                      <p className="text-slate-800 font-medium text-lg leading-relaxed">{data.white_space_analysis}</p>
                 </div>
 
-                <div className="p-6">
+                <div className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[200px] font-bold text-slate-900">Competitor</TableHead>
+                            <TableRow className="hover:bg-transparent">
+                                <TableHead className="w-[200px] font-bold text-slate-900 pl-8 py-4">Competitor</TableHead>
                                 <TableHead className="font-bold text-slate-900">Positioning</TableHead>
-                                <TableHead className="text-right font-bold text-slate-900">Price Range</TableHead>
+                                <TableHead className="text-right font-bold text-slate-900 pr-8">Price Range</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {data.competitors && data.competitors.map((comp, idx) => (
-                                <TableRow key={idx}>
-                                    <TableCell className="font-medium">{comp.name}</TableCell>
-                                    <TableCell>{comp.positioning}</TableCell>
-                                    <TableCell className="text-right font-mono text-slate-600">{comp.price_range}</TableCell>
+                                <TableRow key={idx} className="hover:bg-slate-50/50 border-slate-100">
+                                    <TableCell className="font-bold text-slate-700 pl-8 py-4">{comp.name}</TableCell>
+                                    <TableCell className="text-slate-600">{comp.positioning}</TableCell>
+                                    <TableCell className="text-right font-mono text-violet-600 font-bold pr-8">{comp.price_range}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 border-t border-slate-200">
-                     <div className="p-6 border-r border-slate-200 bg-emerald-50/50">
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-emerald-600 mb-2">Strategic Advantage</h4>
-                        <p className="text-sm text-slate-700">{data.strategic_advantage}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                     <div className="p-8 bg-emerald-50/30 border-t border-r border-slate-100">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-emerald-600 mb-2">🚀 Strategic Advantage</h4>
+                        <p className="text-sm text-slate-700 font-medium">{data.strategic_advantage}</p>
                      </div>
-                     <div className="p-6 flex items-center justify-center bg-slate-50">
-                        <div className="text-center">
-                            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Suggested Pricing</h4>
-                            <span className="text-2xl font-serif font-bold text-slate-900">{data.suggested_pricing}</span>
-                        </div>
+                     <div className="p-8 bg-white flex flex-col items-center justify-center border-t border-slate-100">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Suggested Pricing</h4>
+                        <span className="text-3xl font-extrabold text-slate-900 bg-slate-100 px-4 py-2 rounded-xl">{data.suggested_pricing}</span>
                      </div>
                 </div>
             </CardContent>
@@ -119,43 +135,45 @@ export const TrademarkRiskTable = ({ matrix }) => {
     ];
 
     const getZoneBadge = (zone) => {
-        if (zone === "Green") return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-emerald-200">Green</Badge>;
-        if (zone === "Yellow") return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200">Yellow</Badge>;
-        if (zone === "Red") return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200">Red</Badge>;
+        if (zone === "Green") return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-0 px-3 py-1">Safe</Badge>;
+        if (zone === "Yellow") return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 px-3 py-1">Caution</Badge>;
+        if (zone === "Red") return <Badge className="bg-rose-100 text-rose-800 hover:bg-rose-200 border-0 px-3 py-1">High Risk</Badge>;
         return zone;
     };
 
     return (
-        <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="bg-slate-50 border-b border-slate-100 pb-4">
-                 <CardTitle className="text-lg font-serif text-slate-800">Trademark Risk Matrix</CardTitle>
+        <Card className="playful-card overflow-hidden">
+            <CardHeader className="bg-slate-900 text-white p-6">
+                 <CardTitle className="text-xl font-bold flex items-center">
+                    <span className="mr-2">⚖️</span> Trademark Risk Matrix
+                 </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/50">
-                            <TableHead className="w-[200px] font-bold text-slate-900">Risk Factor</TableHead>
-                            <TableHead className="text-center font-bold text-slate-900 w-[100px]">Likelihood (1-10)</TableHead>
-                            <TableHead className="text-center font-bold text-slate-900 w-[100px]">Severity (1-10)</TableHead>
+                        <TableRow className="bg-slate-50 hover:bg-slate-50 border-slate-100">
+                            <TableHead className="w-[200px] font-bold text-slate-900 pl-6">Risk Factor</TableHead>
+                            <TableHead className="text-center font-bold text-slate-900 w-[100px]">Likelihood</TableHead>
+                            <TableHead className="text-center font-bold text-slate-900 w-[100px]">Severity</TableHead>
                             <TableHead className="text-center font-bold text-slate-900 w-[100px]">Zone</TableHead>
                             <TableHead className="font-bold text-slate-900">Commentary & Mitigation</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {rows.map((row, idx) => (
-                            <TableRow key={idx}>
-                                <TableCell className="font-medium text-slate-700">{row.label}</TableCell>
-                                <TableCell className="text-center">{row.likelihood}</TableCell>
-                                <TableCell className="text-center">{row.severity}</TableCell>
+                            <TableRow key={idx} className="border-slate-100 hover:bg-slate-50/50">
+                                <TableCell className="font-bold text-slate-700 pl-6 py-4">{row.label}</TableCell>
+                                <TableCell className="text-center font-mono text-slate-500">{row.likelihood}/10</TableCell>
+                                <TableCell className="text-center font-mono text-slate-500">{row.severity}/10</TableCell>
                                 <TableCell className="text-center">{getZoneBadge(row.zone)}</TableCell>
-                                <TableCell className="text-sm text-slate-600 leading-relaxed">{row.commentary}</TableCell>
+                                <TableCell className="text-sm text-slate-600 leading-relaxed font-medium">{row.commentary}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
-                <div className="p-6 bg-slate-50 border-t border-slate-200">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Overall Legal Risk Assessment</h4>
-                    <p className="text-sm text-slate-800 leading-relaxed">{matrix.overall_assessment}</p>
+                <div className="p-8 bg-amber-50/50 border-t border-slate-100">
+                    <h4 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-2">⚠️ Overall Legal Assessment</h4>
+                    <p className="text-sm text-slate-800 leading-relaxed font-medium">{matrix.overall_assessment}</p>
                 </div>
             </CardContent>
         </Card>
@@ -166,35 +184,35 @@ export const DomainAvailabilityCard = ({ analysis }) => {
     if (!analysis) return null;
 
     return (
-        <Card className="border-slate-200 shadow-sm h-full">
+        <Card className="playful-card border-l-4 border-l-blue-400 h-full">
             <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-                    Domain Availability
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-blue-400">
+                    🌐 Domain Status
                 </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6 pt-4">
                 <div>
-                    <div className="text-lg font-serif font-bold text-slate-900 mb-1">
+                    <div className="text-2xl font-extrabold text-slate-900 mb-1">
                         {analysis.exact_match_status}
                     </div>
-                    <p className="text-xs text-slate-500 italic">Analysis based on common keyword patterns</p>
                 </div>
                 
                 <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Recommended Alternatives</h4>
-                    <ul className="space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Alternatives</h4>
+                    <ul className="space-y-3">
                         {analysis.alternatives.map((alt, i) => (
-                            <li key={i} className="flex justify-between items-center text-sm border-b border-slate-50 pb-1 last:border-0">
-                                <span className="font-mono text-slate-700">{alt.domain}</span>
-                                <span className="text-xs text-slate-400">{alt.example}</span>
+                            <li key={i} className="flex justify-between items-center text-sm bg-slate-50 p-3 rounded-lg">
+                                <span className="font-bold text-slate-700">{alt.domain}</span>
+                                <span className="text-xs text-slate-400 font-medium">{alt.example}</span>
                             </li>
                         ))}
                     </ul>
                 </div>
 
-                <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
-                    <p className="text-xs text-blue-800 leading-relaxed">
-                        <span className="font-bold">Strategy:</span> {analysis.strategy_note}
+                <div className="bg-blue-50 p-4 rounded-xl border-2 border-blue-100">
+                    <p className="text-sm text-blue-800 leading-relaxed font-medium">
+                        <span className="font-bold block text-xs uppercase tracking-wider text-blue-400 mb-1">Strategy</span> 
+                        {analysis.strategy_note}
                     </p>
                 </div>
             </CardContent>
