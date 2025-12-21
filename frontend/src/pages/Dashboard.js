@@ -140,24 +140,10 @@ const Dashboard = () => {
                                 subtitle="Composite Consulting Grade"
                             />
                             
-                            <Card>
-                                <CardHeader><CardTitle className="text-sm uppercase text-slate-500">Trademark Risk</CardTitle></CardHeader>
-                                <CardContent>
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="font-bold text-xl">{brand.trademark_risk.risk_level}</span>
-                                        <span className="text-sm text-slate-400">Score: {brand.trademark_risk.score}/10</span>
-                                    </div>
-                                    <p className="text-sm text-slate-600 mb-4">{brand.trademark_risk.summary}</p>
-                                    <div className="space-y-2">
-                                        {brand.trademark_risk.details.map((d, i) => (
-                                            <div key={i} className="flex justify-between text-xs border-b border-slate-100 pb-1">
-                                                <span>{d.country}</span>
-                                                <span className={d.risk === 'High' ? 'text-red-500 font-bold' : 'text-slate-600'}>{d.risk}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            {/* Domain Availability Replaces Simple Trademark Card */}
+                            {brand.domain_analysis && (
+                                <DomainAvailabilityCard analysis={brand.domain_analysis} />
+                            )}
                         </div>
 
                         {/* Middle Column: Radar */}
