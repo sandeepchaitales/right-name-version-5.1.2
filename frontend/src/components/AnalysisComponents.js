@@ -210,9 +210,13 @@ export const TrademarkRiskTable = ({ matrix }) => {
     ];
 
     const getZoneBadge = (zone) => {
-        if (zone === "Green") return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">LOW RISK</span>;
-        if (zone === "Yellow") return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">MEDIUM RISK</span>;
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">HIGH RISK</span>;
+        const zoneStr = zone.toLowerCase();
+        if (zoneStr.includes("green")) return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">LOW RISK</span>;
+        if (zoneStr.includes("yellow") || zoneStr.includes("orange")) return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">MODERATE</span>;
+        if (zoneStr.includes("red")) return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">HIGH RISK</span>;
+        
+        // Fallback for unknown zones
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{zone.toUpperCase()}</span>;
     };
 
     return (
