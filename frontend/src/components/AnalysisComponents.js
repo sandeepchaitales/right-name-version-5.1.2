@@ -6,7 +6,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Lightbulb, AlertTriangle, ArrowUpRight, Minus, TrendingUp, Info, DollarSign, Sparkles } from "lucide-react";
+import { CheckCircle2, Lightbulb, AlertTriangle, ArrowUpRight, Minus, TrendingUp, Info, DollarSign, Sparkles, Scale } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 // --- Design System Tokens ---
@@ -231,7 +231,7 @@ export const CompetitionAnalysis = ({ data }) => {
                 </CardContent>
             </Card>
 
-            {/* Right: Competitor Matrix Chart (Replaces Table) */}
+            {/* Right: Competitor Matrix Chart */}
             <Card className={`${CARD_STYLE} lg:col-span-2`}>
                 <CardHeader className="bg-white border-b border-slate-100 pb-4">
                     <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
@@ -251,7 +251,7 @@ export const CompetitionAnalysis = ({ data }) => {
     );
 };
 
-export const TrademarkRiskTable = ({ matrix }) => {
+export const TrademarkRiskTable = ({ matrix, trademarkClasses }) => {
     if (!matrix) return null;
 
     const rows = [
@@ -316,33 +316,21 @@ export const TrademarkRiskTable = ({ matrix }) => {
                 </Table>
             </div>
             
-            {/* Scoring Legend Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row gap-6 text-xs text-slate-500">
-                <div className="flex items-center gap-2">
-                    <Info className="w-4 h-4 text-slate-400" />
-                    <span className="font-bold uppercase tracking-wider">Scoring Key:</span>
-                </div>
-                <div className="flex gap-4 flex-wrap">
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span><strong>1-3:</strong> Low Risk (Green)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                        <span><strong>4-6:</strong> Moderate Risk (Yellow)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                        <span><strong>7-10:</strong> Critical Risk (Red)</span>
+            {/* Trademark Classes Recommendation */}
+            {trademarkClasses && trademarkClasses.length > 0 && (
+                <div className="p-6 bg-violet-50 border-t border-violet-100">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-violet-600 mb-3 flex items-center gap-2">
+                        <Scale className="w-4 h-4" /> Recommended Nice Classes for Filing
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                        {trademarkClasses.map((cls, i) => (
+                            <Badge key={i} variant="outline" className="bg-white text-violet-800 border-violet-200 px-3 py-1 text-xs font-medium shadow-sm">
+                                {cls}
+                            </Badge>
+                        ))}
                     </div>
                 </div>
-                <div className="hidden md:block w-px h-4 bg-slate-300"></div>
-                <div>
-                    <strong>Probability:</strong> Likelihood of legal conflict. 
-                    <span className="mx-2">•</span>
-                    <strong>Severity:</strong> Business impact if conflict occurs.
-                </div>
-            </div>
+            )}
 
             <div className="p-6 bg-white border-t border-slate-100">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Overall Assessment</h4>
