@@ -1,11 +1,12 @@
 import React from 'react';
 import {
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip,
+  ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, ReferenceLine, LabelList, Cell
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Lightbulb, AlertTriangle, ArrowUpRight, Minus, TrendingUp, Info } from "lucide-react";
+import { CheckCircle2, Lightbulb, AlertTriangle, ArrowUpRight, Minus, TrendingUp, Info, DollarSign, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 // --- Design System Tokens ---
@@ -136,6 +137,70 @@ export const ScoreCard = ({ title, score, verdict, subtitle, className }) => {
     );
 };
 
+// New Competitive Matrix Chart Component
+const CompetitiveMatrixChart = ({ competitors }) => {
+    // Helper to map string descriptors to coordinates
+    const mapToCoordinates = (comp) => {
+        let x = 50; // default Mid
+        let y = 50; // default Fusion
+
+        const price = (comp.price_axis || "").toLowerCase();
+        if (price.includes("low") || price.includes("budget") || price.includes("mass")) x = 20;
+        else if (price.includes("high") || price.includes("premium") || price.includes("luxury")) x = 80;
+        else x = 50;
+
+        const mod = (comp.modernity_axis || "").toLowerCase();
+        if (mod.includes("traditional") || mod.includes("heritage") || mod.includes("classic")) y = 20;
+        else if (mod.includes("modern") || mod.includes("avant") || mod.includes("contemporary")) y = 80;
+        else y = 50;
+
+        // Add some jitter to prevent overlap
+        return {
+            name: comp.name,
+            x: x + (Math.random() * 6 - 3), 
+            y: y + (Math.random() * 6 - 3),
+            quadrant: comp.quadrant
+        };
+    };
+
+    const data = competitors.map(mapToCoordinates);
+
+    return (
+        <div className="h-[400px] w-full bg-slate-50/30 rounded-xl border border-slate-100 relative p-4">
+            <ResponsiveContainer width="100%" height="100%">
+                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" dataKey="x" name="Price" unit="" domain={[0, 100]} hide />
+                    <YAxis type="number" dataKey="y" name="Modernity" unit="" domain={[0, 100]} hide />
+                    <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                    <ReferenceLine x={50} stroke="#94a3b8" strokeDasharray="3 3" />
+                    <ReferenceLine y={50} stroke="#94a3b8" strokeDasharray="3 3" />
+                    <Scatter name="Competitors" data={data} fill="#8884d8">
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#7c3aed" : "#0ea5e9"} />
+                        ))}
+                        <LabelList dataKey="name" position="top" style={{ fontSize: 10, fontWeight: 'bold', fill: '#334155' }} />
+                    </Scatter>
+                </ScatterChart>
+            </ResponsiveContainer>
+            
+            {/* Axis Labels */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <Minus className="w-4 h-4" /> Price <ArrowUpRight className="w-4 h-4 rotate-45" />
+            </div>
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <Minus className="w-4 h-4" /> Modernity <ArrowUpRight className="w-4 h-4 rotate-45" />
+            </div>
+
+            {/* Quadrant Labels */}
+            <div className="absolute top-4 right-4 text-[10px] font-bold text-slate-400 bg-white/80 px-2 rounded">AVANT-GARDE LUXURY</div>
+            <div className="absolute bottom-4 left-4 text-[10px] font-bold text-slate-400 bg-white/80 px-2 rounded">MASS TRADITIONAL</div>
+            <div className="absolute top-4 left-4 text-[10px] font-bold text-slate-400 bg-white/80 px-2 rounded">MASS MODERN</div>
+            <div className="absolute bottom-4 right-4 text-[10px] font-bold text-slate-400 bg-white/80 px-2 rounded">HERITAGE LUXURY</div>
+        </div>
+    );
+};
+
 export const CompetitionAnalysis = ({ data }) => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -166,39 +231,21 @@ export const CompetitionAnalysis = ({ data }) => {
                 </CardContent>
             </Card>
 
-            {/* Right: Competitor 2x2 Matrix Table */}
+            {/* Right: Competitor Matrix Chart (Replaces Table) */}
             <Card className={`${CARD_STYLE} lg:col-span-2`}>
                 <CardHeader className="bg-white border-b border-slate-100 pb-4">
-                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500">
-                        Strategic Positioning Matrix (Price vs. Modernity)
+                    <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" /> Strategic Positioning Matrix
                     </CardTitle>
                 </CardHeader>
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50">
-                                <TableHead className="w-[30%] font-bold text-slate-700">Competitor</TableHead>
-                                <TableHead className="w-[20%] font-bold text-slate-700 text-center">X-Axis (Price)</TableHead>
-                                <TableHead className="w-[20%] font-bold text-slate-700 text-center">Y-Axis (Modernity)</TableHead>
-                                <TableHead className="w-[30%] font-bold text-slate-700 text-right">Strategic Quadrant</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.competitors && data.competitors.map((comp, idx) => (
-                                <TableRow key={idx} className="hover:bg-slate-50/50 transition-colors">
-                                    <TableCell className="font-bold text-slate-900">{comp.name}</TableCell>
-                                    <TableCell className="text-slate-600 text-sm text-center font-medium">
-                                        <Badge variant="outline" className="bg-slate-50 text-slate-600">{comp.price_axis}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-slate-600 text-sm text-center font-medium">
-                                        <Badge variant="outline" className="bg-slate-50 text-slate-600">{comp.modernity_axis}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono text-slate-700 text-sm font-bold">{comp.quadrant}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                <CardContent className="p-6">
+                    <CompetitiveMatrixChart competitors={data.competitors} />
+                    <div className="mt-4 text-center">
+                        <p className="text-xs text-slate-400 italic">
+                            *Visual approximation based on market positioning
+                        </p>
+                    </div>
+                </CardContent>
             </Card>
         </div>
     );
