@@ -279,7 +279,7 @@ const Dashboard = () => {
                 {brand.competitor_analysis && (
                     <section className="print:break-inside-avoid">
                         <h3 className="text-xl font-bold text-slate-900 mb-6">Competitive Landscape</h3>
-                        <CompetitionAnalysis data={brand.competitor_analysis} />
+                        <CompetitionAnalysis data={brand.competitor_analysis} verdict={brand.verdict} />
                     </section>
                 )}
 
