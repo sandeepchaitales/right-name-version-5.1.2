@@ -62,6 +62,14 @@ class FinalAssessment(BaseModel):
     recommendations: List[Recommendation]
     alternative_path: str
 
+class AlternativeNameSuggestion(BaseModel):
+    name: str
+    rationale: str
+
+class AlternativeNames(BaseModel):
+    reasoning: str
+    suggestions: List[AlternativeNameSuggestion]
+
 class BrandScore(BaseModel):
     brand_name: str
     namescore: float
@@ -70,6 +78,7 @@ class BrandScore(BaseModel):
     strategic_classification: str
     pros: List[str]
     cons: List[str]
+    alternative_names: Optional[AlternativeNames] = None
     dimensions: List[DimensionScore]
     trademark_risk: dict 
     trademark_matrix: TrademarkRiskMatrix
