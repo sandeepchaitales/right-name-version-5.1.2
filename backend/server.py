@@ -187,17 +187,37 @@ async def evaluate_brands(request: BrandEvaluationRequest):
                 content = response
             else:
                 content = str(response)
-                
+            
+            # Extract JSON from markdown code blocks
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0]
             elif "```" in content:
-                content = content.split("```")[1].split("```")[0]
+                parts = content.split("```")
+                if len(parts) >= 2:
+                    content = parts[1]
+                    if content.startswith("json"):
+                        content = content[4:]
             
             # Sanitization
             content = content.strip()
-            content = clean_json_string(content)
             
-            data = json.loads(content)
+            # Try direct parsing first
+            try:
+                data = json.loads(content)
+            except json.JSONDecodeError:
+                # Apply cleaning only if direct parsing fails
+                logging.info("Direct JSON parsing failed, applying cleanup...")
+                content = clean_json_string(content)
+                try:
+                    data = json.loads(content)
+                except json.JSONDecodeError as je:
+                    # Log the problematic content for debugging (first 500 chars around error)
+                    error_pos = je.pos if hasattr(je, 'pos') else 0
+                    start = max(0, error_pos - 100)
+                    end = min(len(content), error_pos + 100)
+                    logging.error(f"JSON Parse Error at position {error_pos}: {je.msg}")
+                    logging.error(f"Context around error: ...{repr(content[start:end])}...")
+                    raise
             
             evaluation = BrandEvaluationResponse(**data)
             
