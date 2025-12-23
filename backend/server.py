@@ -73,6 +73,15 @@ def clean_json_string(s):
     # Remove bad control characters (0-8, 11, 12, 14-31) but keep tab (9), newline (10), carriage return (13)
     s = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', s)
     
+    # Remove JavaScript-style comments that LLM sometimes adds (// comments)
+    # Only remove comments that are outside of string values
+    s = re.sub(r'//[^\n]*', '', s)
+    
+    # Remove empty array elements that result from comment removal
+    s = re.sub(r'\[\s*,', '[', s)
+    s = re.sub(r',\s*\]', ']', s)
+    s = re.sub(r',\s*,', ',', s)
+    
     return s
 
 def escape_newlines_in_json_strings(json_str):
