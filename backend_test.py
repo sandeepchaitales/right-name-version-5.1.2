@@ -55,7 +55,7 @@ class BrandEvaluationTester:
                 f"{self.api_url}/evaluate", 
                 json=payload, 
                 headers={'Content-Type': 'application/json'},
-                timeout=60  # LLM calls can take time
+                timeout=120  # LLM calls can take time
             )
             
             print(f"Response Status: {response.status_code}")
