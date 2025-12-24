@@ -299,9 +299,6 @@ const LandingPage = () => {
             </div>
         </div>
 
-        {/* Trusted By - Dynamic Cycling Animation */}
-        <TrustedByCycler />
-
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             
             {/* Left Content: Hero Text */}
