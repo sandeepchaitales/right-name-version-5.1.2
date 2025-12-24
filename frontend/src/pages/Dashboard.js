@@ -329,30 +329,6 @@ const Dashboard = () => {
                     </section>
                 )}
 
-                {/* 6. DETAILED ANALYSIS - Last Page */}
-                <section className="print:break-before-page">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Detailed Framework Analysis</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:grid-cols-2">
-                        {brand.dimensions.map((dim, i) => (
-                            <Card key={i} className="bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow rounded-2xl overflow-hidden group print:break-inside-avoid print:mb-4">
-                                <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4 group-hover:bg-slate-50 transition-colors">
-                                    <div className="flex justify-between items-start">
-                                        <CardTitle className="text-base font-bold text-slate-800">{dim.name}</CardTitle>
-                                        <Badge className="bg-white text-violet-700 border-slate-200 font-bold border">
-                                            {dim.score}/10
-                                        </Badge>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="pt-6">
-                                    <div className="text-sm text-slate-600 leading-loose whitespace-pre-wrap font-medium text-justify">
-                                        {parseMarkdownBold(dim.reasoning)}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </section>
-
             </div>
         ))}
       </main>
