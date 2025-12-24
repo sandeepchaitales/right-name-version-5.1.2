@@ -214,7 +214,21 @@ const LandingPage = () => {
       navigate('/dashboard', { state: { data: result, query: payload } });
     } catch (error) {
       console.error(error);
-      const errorMsg = error.response?.data?.detail || "Evaluation failed. Please try again.";
+      let errorMsg = "Evaluation failed. Please try again.";
+      
+      // Handle different error formats
+      const detail = error.response?.data?.detail;
+      if (detail) {
+        if (typeof detail === 'string') {
+          errorMsg = detail;
+        } else if (Array.isArray(detail)) {
+          // Pydantic validation errors come as array of objects
+          errorMsg = detail.map(err => err.msg || err.message || JSON.stringify(err)).join(', ');
+        } else if (typeof detail === 'object') {
+          errorMsg = detail.msg || detail.message || JSON.stringify(detail);
+        }
+      }
+      
       toast.error(
         <div className="flex flex-col gap-1">
             <span className="font-bold">Analysis Failed</span>
