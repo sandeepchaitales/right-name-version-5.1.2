@@ -176,6 +176,10 @@ def repair_json(s):
     s = re.sub(r'"https?:\\n\s*"', '"https://example.com"', s)
     s = re.sub(r'"https?:\s*"', '"https://example.com"', s)
     
+    # Fix missing commas after string values that end with punctuation before a new key
+    # Pattern: "value text."  "next_key":  -> "value text.", "next_key":
+    s = re.sub(r'([.!?])"(\s+)"([a-zA-Z_][a-zA-Z0-9_]*)"(\s*):', r'\1",\2"\3"\4:', s)
+    
     # Fix incomplete string values that end with just a colon and newline
     # Pattern: "key": "value that ends abruptly
     # This replaces dangling strings with a placeholder
