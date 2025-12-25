@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, ShieldCheck, Globe2, BrainCircuit, Search, ArrowRight, Zap, AlertCircle, LogIn, LogOut, User, CheckCircle, Star, Rocket, Target, Trophy, Heart, TrendingUp, Users, Building2, Briefcase } from "lucide-react";
 import { toast } from "sonner";
-import { ReportPreviewCards } from '../components/ReportPreview';
+import { ReportCarousel } from '../components/ReportPreview';
 
 // Dynamic Cycling "Trusted By" Component
 const TrustedByCycler = () => {
