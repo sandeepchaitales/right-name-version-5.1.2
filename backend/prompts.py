@@ -509,17 +509,13 @@ Return ONLY valid JSON.
       ],
       
       "domain_analysis": {
+          "CRITICAL_RULE": "If verdict is REJECT or NO-GO, set alternatives to empty array [] and strategy_note to 'N/A - Name rejected'",
           "exact_match_status": "TAKEN/AVAILABLE/PARKED",
           "risk_level": "LOW/MEDIUM/HIGH - CRITICAL: .com taken alone = LOW risk (max 3/10). Only HIGH if active business + TM exists.",
           "has_active_business": "YES/NO - Is there an operating business at this domain?",
           "has_trademark": "YES/NO/UNKNOWN - Is there a registered TM for this name in target category?",
-          "alternatives": [
-              {"domain": "brand.io", "rationale": "Tech-friendly alternative"},
-              {"domain": "brand.co.in", "rationale": "India country-code"},
-              {"domain": "brand.shop", "rationale": "Category-specific TLD"},
-              {"domain": "getbrand.com", "rationale": "Prefix variation"}
-          ],
-          "strategy_note": "RULE: If .com is taken but parked/inactive, recommend alternatives. Domain alone should NOT drive rejection.",
+          "alternatives": "IF VERDICT IS REJECT/NO-GO: Return empty array []. OTHERWISE: Suggest 4 domain alternatives",
+          "strategy_note": "IF VERDICT IS REJECT/NO-GO: Return 'N/A - Name rejected'. OTHERWISE: Domain acquisition strategy.",
           "score_impact": "-1 point max for taken .com. Prioritize category TLDs (.fashion, .tech, .shop) over .com"
       },
 
