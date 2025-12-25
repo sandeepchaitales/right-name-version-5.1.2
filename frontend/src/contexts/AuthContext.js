@@ -56,7 +56,18 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({ email, password, name })
             });
             
-            const data = await response.json();
+            // Clone response to safely read it
+            const responseClone = response.clone();
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                // If JSON parsing fails, try to get text
+                const text = await responseClone.text();
+                console.error('Response parsing error:', text);
+                throw new Error('Registration failed - server error');
+            }
             
             if (!response.ok) {
                 throw new Error(data.detail || 'Registration failed');
@@ -81,7 +92,17 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({ email, password })
             });
             
-            const data = await response.json();
+            // Clone response to safely read it
+            const responseClone = response.clone();
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                const text = await responseClone.text();
+                console.error('Response parsing error:', text);
+                throw new Error('Login failed - server error');
+            }
             
             if (!response.ok) {
                 throw new Error(data.detail || 'Login failed');
