@@ -27,14 +27,14 @@ class DomainAnalysis(BaseModel):
     risk_level: Optional[str] = Field(default="LOW", description="LOW/MEDIUM/HIGH - .com alone = LOW risk")
     has_active_business: Optional[str] = Field(default="UNKNOWN", description="Is there an operating business?")
     has_trademark: Optional[str] = Field(default="UNKNOWN", description="Is there a registered TM?")
-    alternatives: List[Union[Dict[str, str], str]] = Field(default=[])
+    alternatives: List[Union[Dict[str, Any], str]] = Field(default=[])
     strategy_note: str = Field(default="")
     score_impact: Optional[str] = Field(default="-1 point max for taken .com", description="Score impact explanation")
     
     @field_validator('alternatives', mode='before')
     @classmethod
     def normalize_alternatives(cls, v):
-        """Handle both string and dict formats for domain alternatives"""
+        """Handle both string and dict formats for domain alternatives, converting booleans to strings"""
         if not v:
             return []
         result = []
@@ -43,7 +43,16 @@ class DomainAnalysis(BaseModel):
                 # Convert string to dict format
                 result.append({"domain": item, "status": "suggested"})
             elif isinstance(item, dict):
-                result.append(item)
+                # Convert all values to strings to avoid type mismatches
+                normalized = {}
+                for key, val in item.items():
+                    if isinstance(val, bool):
+                        normalized[key] = "true" if val else "false"
+                    elif val is None:
+                        normalized[key] = ""
+                    else:
+                        normalized[key] = str(val)
+                result.append(normalized)
         return result
 
 class DomainCheckResult(BaseModel):
