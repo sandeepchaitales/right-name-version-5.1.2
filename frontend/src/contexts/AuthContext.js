@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await fetch('/api/auth/logout', {
+            await fetch(`${API_URL}/auth/logout`, {
                 method: 'POST',
                 credentials: 'include'
             });
@@ -139,7 +139,7 @@ export const AuthProvider = ({ children }) => {
 
     const processSessionId = async (sessionId) => {
         try {
-            const response = await fetch('/api/auth/session', {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
