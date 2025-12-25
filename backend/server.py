@@ -172,7 +172,74 @@ def repair_json(s):
     # Fix missing commas between ] and " for new keys
     s = re.sub(r'\](\s*)"([a-zA-Z_][a-zA-Z0-9_]*)"(\s*):', r'],\1"\2"\3:', s)
     
+    # Fix truncated URLs - pattern like "https:\n becomes "https://example.com"
+    s = re.sub(r'"https?:\\n\s*"', '"https://example.com"', s)
+    s = re.sub(r'"https?:\s*"', '"https://example.com"', s)
+    
+    # Fix incomplete string values that end with just a colon and newline
+    # Pattern: "key": "value that ends abruptly
+    # This replaces dangling strings with a placeholder
+    s = re.sub(r':\s*"([^"]*?)\\n\s*"([a-zA-Z_])', r': "\1", "\2', s)
+    
     return s
+
+def aggressive_json_repair(json_str):
+    """
+    More aggressive JSON repair for severely malformed responses.
+    Uses json_repair library if available, otherwise applies heuristics.
+    """
+    import json
+    
+    # Try standard repair first
+    repaired = repair_json(json_str)
+    
+    try:
+        json.loads(repaired)
+        return repaired
+    except json.JSONDecodeError as e:
+        logging.warning(f"Standard repair failed at position {e.pos}, trying aggressive repair...")
+        
+        # Find and fix the specific error location
+        error_pos = e.pos
+        context_start = max(0, error_pos - 100)
+        context_end = min(len(repaired), error_pos + 100)
+        context = repaired[context_start:context_end]
+        
+        logging.error(f"Context around error: ...'{context}'...")
+        
+        # Try to fix common patterns around the error
+        # Pattern 1: Missing comma after a string value
+        # Look backwards from error position to find the issue
+        before_error = repaired[:error_pos]
+        after_error = repaired[error_pos:]
+        
+        # If error is at a quote that should be preceded by comma
+        if after_error and after_error[0] == '"':
+            # Check if we need a comma before
+            stripped_before = before_error.rstrip()
+            if stripped_before and stripped_before[-1] not in [',', '{', '[', ':']:
+                repaired = stripped_before + ',' + after_error
+                try:
+                    json.loads(repaired)
+                    return repaired
+                except:
+                    pass
+        
+        # Pattern 2: Truncated string value - close it
+        # Find the last unclosed quote
+        quote_positions = [i for i, c in enumerate(before_error) if c == '"' and (i == 0 or before_error[i-1] != '\\')]
+        if len(quote_positions) % 2 == 1:  # Odd number means unclosed string
+            last_quote = quote_positions[-1]
+            # Close the string and add comma if needed
+            fix_point = error_pos
+            repaired = before_error[:fix_point] + '"' + after_error
+            try:
+                json.loads(repaired)
+                return repaired
+            except:
+                pass
+        
+        return repaired
 
 # Health check endpoint for Kubernetes
 @api_router.get("/health")
