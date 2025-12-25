@@ -692,10 +692,32 @@ app.include_router(api_router)
 async def root_health_check():
     return {"status": "healthy"}
 
+# Get CORS origins - handle both wildcard and specific origins
+cors_origins_env = os.environ.get('CORS_ORIGINS', '*')
+if cors_origins_env == '*':
+    # For wildcard, we need to use a list that allows any origin
+    # But with credentials=True, we need to handle this dynamically
+    cors_origins = ["*"]
+    allow_credentials = False  # Can't use credentials with wildcard
+else:
+    cors_origins = cors_origins_env.split(',')
+    allow_credentials = True
+
+# For development and production with credentials, add common origins
+if cors_origins == ["*"]:
+    cors_origins = [
+        "http://localhost:3000",
+        "http://localhost:8001",
+        "https://brandcheck.preview.emergentagent.com",
+        "https://rightname.ai",
+        "https://www.rightname.ai"
+    ]
+    allow_credentials = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_credentials=allow_credentials,
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
