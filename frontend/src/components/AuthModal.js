@@ -72,8 +72,18 @@ const AuthModal = () => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md bg-white rounded-2xl shadow-2xl border-0 overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={(e) => {
+                // Close modal when clicking the backdrop (outside the card)
+                if (e.target === e.currentTarget) {
+                    closeAuthModal();
+                }
+            }}
+        >
+            <Card className="w-full max-w-md bg-white rounded-2xl shadow-2xl border-0 overflow-hidden animate-in fade-in zoom-in duration-300 relative z-10"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Header */}
                 <CardHeader className="relative bg-gradient-to-r from-violet-600 via-fuchsia-500 to-orange-500 text-white pb-8 pt-6">
                     <button 
