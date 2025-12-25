@@ -7,23 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { 
     Printer, ArrowLeft, CheckCircle2, XCircle, Star, Shield, Globe, 
     Lock, Sparkles, TrendingUp, AlertTriangle, Users, Zap, 
-    BarChart3, Target, Award, FileText, Calendar
+    BarChart3, Target, Award, FileText, Calendar, Lightbulb,
+    Rocket, MessageSquare, Scale, Building2, Hash, AtSign,
+    CheckCircle, XOctagon, HelpCircle, Map, Briefcase, UserCheck
 } from "lucide-react";
 
 // RIGHTNAME Logo URL
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_38043537-e3af-491b-9b60-3b8b2372877a/artifacts/9yz5wf80_rightname.ai%20logo%20%281%29.png";
-
-// Helper function to parse markdown bold
-const parseMarkdownBold = (text) => {
-    if (!text) return text;
-    const parts = text.split(/(\*\*[^*]+\*\*)/g);
-    return parts.map((part, index) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={index} className="font-bold text-slate-800">{part.slice(2, -2)}</strong>;
-        }
-        return part;
-    });
-};
 
 // ============ PRINT-SAFE CARD WRAPPER ============
 const PrintCard = ({ children, className = "" }) => (
@@ -32,19 +22,48 @@ const PrintCard = ({ children, className = "" }) => (
     </div>
 );
 
-// ============ COVER PAGE (Print Only) ============
+// ============ SECTION HEADER ============
+const SectionHeader = ({ icon: Icon, title, subtitle, color = "violet", badge }) => {
+    const colors = {
+        violet: "text-violet-600 bg-violet-100",
+        emerald: "text-emerald-600 bg-emerald-100",
+        fuchsia: "text-fuchsia-600 bg-fuchsia-100",
+        amber: "text-amber-600 bg-amber-100",
+        blue: "text-blue-600 bg-blue-100",
+        red: "text-red-600 bg-red-100",
+        cyan: "text-cyan-600 bg-cyan-100",
+    };
+    
+    return (
+        <div className="flex items-center justify-between mb-6 print:mb-4">
+            <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl ${colors[color]} flex items-center justify-center print:w-8 print:h-8`}>
+                    <Icon className={`w-5 h-5 ${colors[color].split(' ')[0]} print:w-4 print:h-4`} />
+                </div>
+                <div>
+                    <h2 className="text-xl font-black text-slate-900 print:text-lg">{title}</h2>
+                    {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+                </div>
+            </div>
+            {badge && <Badge variant="outline" className="text-slate-500">{badge}</Badge>}
+        </div>
+    );
+};
+
+// ============ SUB-SECTION HEADER ============
+const SubSectionHeader = ({ icon: Icon, title, color = "slate" }) => (
+    <div className="flex items-center gap-2 mb-3">
+        {Icon && <Icon className={`w-4 h-4 text-${color}-500`} />}
+        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-600">{title}</h4>
+    </div>
+);
+
+// ============ COVER PAGE ============
 const CoverPage = ({ brandName, score, verdict, date, query }) => (
     <div className="hidden print:flex print:flex-col print:min-h-screen print:items-center print:justify-center print:bg-white print:p-12">
         <div className="text-center">
-            {/* Logo */}
-            <div className="mb-8">
-                <img src={LOGO_URL} alt="RIGHTNAME" className="h-16 mx-auto" />
-            </div>
-            
-            {/* Brand Name */}
+            <img src={LOGO_URL} alt="RIGHTNAME" className="h-16 mx-auto mb-8" />
             <h1 className="text-6xl font-black text-slate-900 mb-4">{brandName}</h1>
-            
-            {/* Score Badge */}
             <div className="inline-flex items-center gap-4 mb-8">
                 <div className={`px-6 py-3 rounded-full text-2xl font-black ${
                     verdict === 'GO' ? 'bg-emerald-100 text-emerald-700' :
@@ -54,60 +73,28 @@ const CoverPage = ({ brandName, score, verdict, date, query }) => (
                     {score}/100 • {verdict}
                 </div>
             </div>
-            
-            {/* Meta Info */}
             <div className="text-slate-500 space-y-2">
                 <p className="text-lg">{query?.category} • {query?.market_scope}</p>
                 <p className="flex items-center justify-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {date}
+                    <Calendar className="w-4 h-4" />{date}
                 </p>
             </div>
-            
-            {/* Divider */}
             <div className="w-32 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto my-8 rounded-full"></div>
-            
             <p className="text-sm text-slate-400 uppercase tracking-widest">Brand Name Analysis Report</p>
         </div>
     </div>
 );
 
-// ============ SECTION HEADER ============
-const SectionHeader = ({ icon: Icon, title, subtitle, color = "violet" }) => {
-    const colors = {
-        violet: "from-violet-500 to-violet-600 text-violet-600 bg-violet-100",
-        emerald: "from-emerald-500 to-emerald-600 text-emerald-600 bg-emerald-100",
-        fuchsia: "from-fuchsia-500 to-fuchsia-600 text-fuchsia-600 bg-fuchsia-100",
-        amber: "from-amber-500 to-amber-600 text-amber-600 bg-amber-100",
-        blue: "from-blue-500 to-blue-600 text-blue-600 bg-blue-100",
-    };
-    
-    return (
-        <div className="flex items-center gap-3 mb-6 print:mb-4">
-            <div className={`w-10 h-10 rounded-xl ${colors[color].split(' ')[2]} flex items-center justify-center print:w-8 print:h-8`}>
-                <Icon className={`w-5 h-5 ${colors[color].split(' ')[1]} print:w-4 print:h-4`} />
-            </div>
-            <div>
-                <h2 className="text-xl font-black text-slate-900 print:text-lg">{title}</h2>
-                {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
-            </div>
-        </div>
-    );
-};
-
-// ============ SCORE CARD (Revamped) ============
+// ============ SCORE CARD ============
 const ScoreCardRevamped = ({ score, verdict }) => {
-    const getVerdictStyle = () => {
+    const getStyle = () => {
         switch(verdict) {
             case 'GO': return 'from-emerald-400 to-teal-500 text-emerald-700 bg-emerald-50 border-emerald-200';
             case 'CONDITIONAL GO': return 'from-amber-400 to-orange-500 text-amber-700 bg-amber-50 border-amber-200';
-            case 'NO-GO': 
-            case 'REJECT': return 'from-red-400 to-rose-500 text-red-700 bg-red-50 border-red-200';
-            default: return 'from-slate-400 to-slate-500 text-slate-700 bg-slate-50 border-slate-200';
+            default: return 'from-red-400 to-rose-500 text-red-700 bg-red-50 border-red-200';
         }
     };
-    
-    const style = getVerdictStyle();
+    const style = getStyle();
     
     return (
         <PrintCard>
@@ -117,10 +104,10 @@ const ScoreCardRevamped = ({ score, verdict }) => {
                     <Award className="w-5 h-5 opacity-50" />
                 </div>
                 <div className="text-center py-4 print:py-2">
-                    <div className="text-7xl font-black print:text-5xl">{score}</div>
+                    <div className="text-6xl font-black print:text-5xl">{score}</div>
                     <div className="text-xl text-slate-400 font-bold">/100</div>
                 </div>
-                <div className={`text-center py-2 px-4 rounded-xl bg-gradient-to-r ${style.split(' ').slice(0, 2).join(' ')} text-white font-bold`}>
+                <div className={`text-center py-2 px-4 rounded-xl bg-gradient-to-r ${style.split(' ').slice(0, 2).join(' ')} text-white font-bold text-lg`}>
                     {verdict}
                 </div>
             </div>
@@ -128,240 +115,744 @@ const ScoreCardRevamped = ({ score, verdict }) => {
     );
 };
 
-// ============ DIMENSION CARD (Revamped) ============
-const DimensionCard = ({ dimension, index }) => {
-    const getScoreColor = (score) => {
-        if (score >= 8) return 'from-emerald-400 to-emerald-500';
-        if (score >= 6) return 'from-violet-400 to-fuchsia-500';
-        return 'from-amber-400 to-orange-500';
-    };
-    
-    const icons = ['✨', '🎯', '🛡️', '🌍', '💫', '🔮', '⚡', '🎨'];
-    
-    return (
-        <PrintCard>
-            <div className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-shadow print:p-4 print:border-slate-300">
-                <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                        <span className="text-xl">{icons[index % icons.length]}</span>
-                        <h4 className="font-bold text-slate-800 text-sm">{dimension.name}</h4>
-                    </div>
-                    <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getScoreColor(dimension.score)} text-white text-sm font-bold`}>
-                        {dimension.score}/10
-                    </div>
-                </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden mb-3">
-                    <div 
-                        className={`h-full rounded-full bg-gradient-to-r ${getScoreColor(dimension.score)}`}
-                        style={{ width: `${dimension.score * 10}%` }}
-                    />
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                    {parseMarkdownBold(dimension.reasoning)}
-                </p>
-            </div>
-        </PrintCard>
-    );
-};
-
-// ============ STRENGTHS & RISKS CARDS ============
-const StrengthsRisksCard = ({ pros, cons }) => (
+// ============ QUICK DIMENSIONS GRID ============
+const QuickDimensionsGrid = ({ dimensions }) => (
     <PrintCard>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:gap-3">
-            {/* Strengths */}
-            <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 rounded-xl p-5 print:p-4">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        <div className="bg-white rounded-2xl p-6 border border-slate-200 print:p-4">
+            <SubSectionHeader icon={BarChart3} title="Quick Dimensions" />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 print:gap-3">
+                {dimensions?.slice(0, 6).map((dim, i) => (
+                    <div key={i} className="p-3 bg-slate-50 rounded-xl">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-semibold text-slate-600 truncate max-w-[100px]">{dim.name}</span>
+                            <span className="text-sm font-black text-slate-800">{dim.score}/10</span>
+                        </div>
+                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div 
+                                className={`h-full rounded-full ${dim.score >= 8 ? 'bg-emerald-500' : dim.score >= 6 ? 'bg-violet-500' : 'bg-amber-500'}`}
+                                style={{ width: `${dim.score * 10}%` }}
+                            />
+                        </div>
                     </div>
-                    <h4 className="font-bold text-emerald-700">Key Strengths</h4>
-                </div>
-                <ul className="space-y-2">
-                    {pros?.map((pro, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                            <span className="text-emerald-500 mt-0.5">✓</span>
-                            {pro}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            
-            {/* Risks */}
-            <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-200 rounded-xl p-5 print:p-4">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <h4 className="font-bold text-amber-700">Potential Risks</h4>
-                </div>
-                <ul className="space-y-2">
-                    {cons?.map((con, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                            <span className="text-amber-500 mt-0.5">!</span>
-                            {con}
-                        </li>
-                    ))}
-                </ul>
+                ))}
             </div>
         </div>
     </PrintCard>
 );
 
-// ============ COMPETITOR CARD ============
-const CompetitorCard = ({ competitor }) => {
-    const getRiskColor = (risk) => {
-        const riskLower = (risk || '').toLowerCase();
-        if (riskLower === 'low' || riskLower === 'none') return 'bg-emerald-100 text-emerald-700';
-        if (riskLower === 'medium' || riskLower === 'moderate') return 'bg-amber-100 text-amber-700';
+// ============ FINAL ASSESSMENT (FULL) ============
+const FinalAssessmentFull = ({ assessment, verdict, score }) => {
+    if (!assessment) return null;
+    
+    return (
+        <div className="space-y-4">
+            {/* Verdict Banner */}
+            <PrintCard>
+                <div className={`rounded-2xl p-6 text-white ${
+                    verdict === 'GO' ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500' :
+                    verdict === 'CONDITIONAL GO' ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+                    'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
+                }`}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                                <Zap className="w-7 h-7" />
+                            </div>
+                            <div>
+                                <p className="text-sm uppercase tracking-widest opacity-80">Consultant Verdict</p>
+                                <h2 className="text-3xl font-black">{verdict}</h2>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-xs opacity-80">Suitability Score</p>
+                            <p className="text-3xl font-black">{assessment.suitability_score || (score/10).toFixed(1)}/10</p>
+                        </div>
+                    </div>
+                    {assessment.bottom_line && (
+                        <p className="mt-4 text-white/90 border-t border-white/20 pt-4 text-sm">
+                            "{assessment.bottom_line}"
+                        </p>
+                    )}
+                </div>
+            </PrintCard>
+
+            {/* Strategic Roadmap */}
+            {(assessment.ip_strategy || assessment.brand_narrative || assessment.launch_tactics) && (
+                <PrintCard>
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                        <SubSectionHeader icon={Map} title="Strategic Roadmap" color="violet" />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {assessment.ip_strategy && (
+                                <div className="bg-violet-50 rounded-xl p-4 border border-violet-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Shield className="w-4 h-4 text-violet-600" />
+                                        <h5 className="font-bold text-violet-800 text-sm">IP Strategy</h5>
+                                    </div>
+                                    <p className="text-xs text-slate-600">{assessment.ip_strategy}</p>
+                                </div>
+                            )}
+                            {assessment.brand_narrative && (
+                                <div className="bg-fuchsia-50 rounded-xl p-4 border border-fuchsia-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <MessageSquare className="w-4 h-4 text-fuchsia-600" />
+                                        <h5 className="font-bold text-fuchsia-800 text-sm">Brand Narrative</h5>
+                                    </div>
+                                    <p className="text-xs text-slate-600">{assessment.brand_narrative}</p>
+                                </div>
+                            )}
+                            {assessment.launch_tactics && (
+                                <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Rocket className="w-4 h-4 text-orange-600" />
+                                        <h5 className="font-bold text-orange-800 text-sm">Launch Tactics</h5>
+                                    </div>
+                                    <p className="text-xs text-slate-600">{assessment.launch_tactics}</p>
+                                </div>
+                            )}
+                        </div>
+                        {assessment.contingency_note && (
+                            <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <p className="text-xs text-slate-600 italic">💡 {assessment.contingency_note}</p>
+                            </div>
+                        )}
+                    </div>
+                </PrintCard>
+            )}
+
+            {/* Recommended Next Steps */}
+            {assessment.recommended_next_steps && assessment.recommended_next_steps.length > 0 && (
+                <PrintCard>
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                        <SubSectionHeader icon={FileText} title="Recommended Next Steps" color="blue" />
+                        <div className="space-y-2">
+                            {assessment.recommended_next_steps.map((step, i) => (
+                                <div key={i} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                                    <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</span>
+                                    <p className="text-sm text-slate-700">{step}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </PrintCard>
+            )}
+        </div>
+    );
+};
+
+// ============ STRATEGY SNAPSHOT ============
+const StrategySnapshot = ({ classification, pros, cons }) => (
+    <div className="space-y-4">
+        {classification && (
+            <PrintCard>
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
+                    <p className="text-lg font-bold text-violet-900 italic text-center">"{classification}"</p>
+                </div>
+            </PrintCard>
+        )}
+        <PrintCard>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <h4 className="font-bold text-emerald-700">KEY STRENGTHS</h4>
+                    </div>
+                    <ul className="space-y-2">
+                        {pros?.map((pro, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                                <span className="text-emerald-500 mt-0.5">✓</span>
+                                {pro}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-200 rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <AlertTriangle className="w-4 h-4 text-amber-600" />
+                        </div>
+                        <h4 className="font-bold text-amber-700">KEY RISKS</h4>
+                    </div>
+                    <ul className="space-y-2">
+                        {cons?.map((con, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                                <span className="text-amber-500 mt-0.5">!</span>
+                                {con}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </PrintCard>
+    </div>
+);
+
+// ============ DETAILED DIMENSION CARD ============
+const DetailedDimensionCard = ({ dimension, index }) => {
+    const icons = ['✨', '🌍', '💎', '📈', '⚖️', '🎯', '🔮', '🎨'];
+    const getScoreColor = (score) => {
+        if (score >= 8) return 'from-emerald-400 to-emerald-500 bg-emerald-100 text-emerald-700';
+        if (score >= 6) return 'from-violet-400 to-fuchsia-500 bg-violet-100 text-violet-700';
+        return 'from-amber-400 to-orange-500 bg-amber-100 text-amber-700';
+    };
+    const colors = getScoreColor(dimension.score);
+    
+    // Parse sub-sections from reasoning if available
+    const parseReasoning = (text) => {
+        if (!text) return { main: '', sections: [] };
+        const sections = [];
+        const patterns = [
+            /\*\*([^*]+)\*\*:?\s*([^*]+?)(?=\*\*|$)/g,
+            /([A-Z][a-z]+ [A-Z][a-z]+):\s*([^.]+\.)/g
+        ];
+        
+        let main = text;
+        patterns.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(text)) !== null) {
+                sections.push({ title: match[1].trim(), content: match[2].trim() });
+            }
+        });
+        
+        return { main: sections.length > 0 ? '' : text, sections };
+    };
+    
+    const parsed = parseReasoning(dimension.reasoning);
+    
+    return (
+        <PrintCard>
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                <div className={`px-5 py-4 ${colors.split(' ').slice(2, 4).join(' ')} border-b`}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xl">{icons[index % icons.length]}</span>
+                            <h4 className="font-bold text-slate-800">{dimension.name}</h4>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${colors.split(' ').slice(0, 2).join(' ')} text-white text-sm font-bold`}>
+                            {dimension.score}/10
+                        </div>
+                    </div>
+                </div>
+                <div className="p-5">
+                    {/* Progress bar */}
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
+                        <div className={`h-full rounded-full bg-gradient-to-r ${colors.split(' ').slice(0, 2).join(' ')}`} style={{ width: `${dimension.score * 10}%` }} />
+                    </div>
+                    
+                    {/* Sub-sections or main text */}
+                    {parsed.sections.length > 0 ? (
+                        <div className="space-y-3">
+                            {parsed.sections.map((sec, i) => (
+                                <div key={i} className="p-3 bg-slate-50 rounded-lg">
+                                    <h5 className="text-xs font-bold text-slate-700 uppercase mb-1">{sec.title}</h5>
+                                    <p className="text-xs text-slate-600">{sec.content}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-slate-600 leading-relaxed">{dimension.reasoning}</p>
+                    )}
+                </div>
+            </div>
+        </PrintCard>
+    );
+};
+
+// ============ DIGITAL PRESENCE SECTION ============
+const DigitalPresenceSection = ({ multiDomain, domainAnalysis, socialAvailability }) => {
+    const categoryDomains = multiDomain?.category_domains || [];
+    const countryDomains = multiDomain?.country_domains || [];
+    const socialHandles = socialAvailability?.platforms || socialAvailability?.handles || [];
+    
+    const availableCount = [...categoryDomains, ...countryDomains].filter(d => d.available || d.status?.toLowerCase().includes('available')).length;
+    const totalCount = categoryDomains.length + countryDomains.length;
+    
+    return (
+        <div className="space-y-4">
+            {/* Domain Check */}
+            <PrintCard>
+                <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <SubSectionHeader icon={Globe} title="Multi-Domain Check" />
+                        <Badge className={availableCount > totalCount/2 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
+                            {availableCount}/{totalCount} Available
+                        </Badge>
+                    </div>
+                    
+                    {categoryDomains.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-xs font-bold text-slate-500 uppercase mb-2">Category TLDs</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                {categoryDomains.map((d, i) => (
+                                    <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${
+                                        d.available || d.status?.toLowerCase().includes('available') 
+                                            ? 'bg-emerald-50 border-emerald-200' 
+                                            : 'bg-red-50 border-red-200'
+                                    }`}>
+                                        <span className="font-mono text-xs font-bold text-slate-700">{d.domain}</span>
+                                        {d.available || d.status?.toLowerCase().includes('available') 
+                                            ? <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                            : <XOctagon className="w-4 h-4 text-red-500" />
+                                        }
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {countryDomains.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-xs font-bold text-slate-500 uppercase mb-2">Country TLDs</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                {countryDomains.map((d, i) => (
+                                    <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${
+                                        d.available || d.status?.toLowerCase().includes('available') 
+                                            ? 'bg-emerald-50 border-emerald-200' 
+                                            : 'bg-red-50 border-red-200'
+                                    }`}>
+                                        <span className="font-mono text-xs font-bold text-slate-700">{d.domain}</span>
+                                        {d.available || d.status?.toLowerCase().includes('available') 
+                                            ? <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                            : <XOctagon className="w-4 h-4 text-red-500" />
+                                        }
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {multiDomain?.recommended_domain && (
+                        <div className="p-4 bg-violet-50 rounded-xl border border-violet-200">
+                            <p className="text-xs font-bold text-violet-700 uppercase mb-1">Recommended Domain</p>
+                            <p className="font-mono font-bold text-violet-900">{multiDomain.recommended_domain}</p>
+                            {multiDomain.acquisition_strategy && (
+                                <p className="text-xs text-slate-600 mt-2">{multiDomain.acquisition_strategy}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </PrintCard>
+            
+            {/* Social Handles */}
+            {socialHandles.length > 0 && (
+                <PrintCard>
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                        <SubSectionHeader icon={AtSign} title="Social Handles" />
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {socialHandles.map((s, i) => (
+                                <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${
+                                    s.available || s.status?.toLowerCase().includes('available')
+                                        ? 'bg-emerald-50 border-emerald-200'
+                                        : s.status?.toLowerCase().includes('unsupported') || s.status?.toLowerCase().includes('error')
+                                            ? 'bg-slate-50 border-slate-200'
+                                            : 'bg-red-50 border-red-200'
+                                }`}>
+                                    <span className="text-xs font-bold text-slate-700 capitalize">{s.platform || s.name}</span>
+                                    <Badge className={`text-xs ${
+                                        s.available || s.status?.toLowerCase().includes('available')
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : s.status?.toLowerCase().includes('unsupported') || s.status?.toLowerCase().includes('error')
+                                                ? 'bg-slate-100 text-slate-500'
+                                                : 'bg-red-100 text-red-700'
+                                    }`}>
+                                        {s.status || (s.available ? 'Available' : 'Taken')}
+                                    </Badge>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </PrintCard>
+            )}
+        </div>
+    );
+};
+
+// ============ MARKET INTELLIGENCE SECTION ============
+const MarketIntelligenceSection = ({ domainAnalysis, visibilityAnalysis, culturalAnalysis }) => {
+    return (
+        <div className="space-y-4">
+            {/* Domain Status */}
+            {domainAnalysis && (
+                <PrintCard>
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                        <SubSectionHeader icon={Globe} title="Domain Status" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className={`p-4 rounded-xl ${
+                                domainAnalysis.exact_match_status === 'AVAILABLE' 
+                                    ? 'bg-emerald-50 border border-emerald-200' 
+                                    : 'bg-red-50 border border-red-200'
+                            }`}>
+                                <p className="text-xs font-bold text-slate-500 uppercase mb-1">.COM Status</p>
+                                <p className={`text-xl font-black ${
+                                    domainAnalysis.exact_match_status === 'AVAILABLE' ? 'text-emerald-700' : 'text-red-700'
+                                }`}>{domainAnalysis.exact_match_status}</p>
+                                <Badge className="mt-2">{domainAnalysis.risk_level || 'LOW'} RISK</Badge>
+                            </div>
+                            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                <p className="text-xs font-bold text-slate-500 uppercase mb-2">Conflict Verification</p>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-600">Active Trademark</span>
+                                        <Badge variant="outline">{domainAnalysis.has_trademark || 'UNKNOWN'}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-600">Operating Business</span>
+                                        <Badge variant="outline">{domainAnalysis.has_active_business || 'UNKNOWN'}</Badge>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+                                    <CheckCircle className="w-3 h-3" /> No trademark or active business found
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {/* Alternatives */}
+                        {domainAnalysis.alternatives?.length > 0 && (
+                            <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                <p className="text-xs font-bold text-blue-700 uppercase mb-2">Recommended Alternatives</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {domainAnalysis.alternatives.map((alt, i) => (
+                                        <Badge key={i} className="bg-white text-blue-700 border border-blue-200">
+                                            {alt.domain || alt}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {domainAnalysis.strategy_note && (
+                            <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                                <p className="text-xs text-amber-800">💡 {domainAnalysis.strategy_note}</p>
+                            </div>
+                        )}
+                        
+                        {domainAnalysis.score_impact && (
+                            <p className="mt-3 text-xs text-slate-500">
+                                <strong>Score Impact:</strong> {domainAnalysis.score_impact}
+                            </p>
+                        )}
+                    </div>
+                </PrintCard>
+            )}
+            
+            {/* Visibility / Conflict Analysis */}
+            {visibilityAnalysis && (
+                <PrintCard>
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                        <SubSectionHeader icon={Target} title="Conflict Relevance Analysis" />
+                        
+                        {/* Summary */}
+                        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 mb-4">
+                            <p className="text-lg font-bold text-emerald-700">
+                                {visibilityAnalysis.direct_conflicts_count || 0} direct competitors • {visibilityAnalysis.phonetic_conflicts_count || 0} phonetic conflicts
+                            </p>
+                            <p className="text-xs text-slate-600">All found name twins belong to different sectors.</p>
+                        </div>
+                        
+                        {/* Product Intent & Target Customer */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            {visibilityAnalysis.product_intent && (
+                                <div className="p-4 bg-violet-50 rounded-xl border border-violet-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Briefcase className="w-4 h-4 text-violet-600" />
+                                        <p className="text-xs font-bold text-violet-700 uppercase">Your Product Intent</p>
+                                    </div>
+                                    <p className="text-sm text-slate-700">{visibilityAnalysis.product_intent}</p>
+                                </div>
+                            )}
+                            {visibilityAnalysis.target_customer && (
+                                <div className="p-4 bg-fuchsia-50 rounded-xl border border-fuchsia-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <UserCheck className="w-4 h-4 text-fuchsia-600" />
+                                        <p className="text-xs font-bold text-fuchsia-700 uppercase">Your Target Customer</p>
+                                    </div>
+                                    <p className="text-sm text-slate-700">{visibilityAnalysis.target_customer}</p>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* False Positives */}
+                        {visibilityAnalysis.false_positives?.length > 0 && (
+                            <div>
+                                <p className="text-xs font-bold text-slate-500 uppercase mb-3">False Positives Filtered (Keyword Match Only)</p>
+                                <div className="space-y-3">
+                                    {visibilityAnalysis.false_positives.map((fp, i) => (
+                                        <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h5 className="font-bold text-slate-800">{fp.name}</h5>
+                                                <Badge className="bg-emerald-100 text-emerald-700">NOT A CONFLICT</Badge>
+                                            </div>
+                                            <p className="text-xs text-slate-500 mb-2">{fp.category}</p>
+                                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                                <div><strong>Their Intent:</strong> {fp.their_intent}</div>
+                                                <div><strong>Their Customers:</strong> {fp.their_customers}</div>
+                                            </div>
+                                            <p className="text-xs text-slate-600 mt-2 italic">{fp.conclusion}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="mt-3 text-xs text-emerald-600 flex items-center gap-1">
+                                    <CheckCircle className="w-3 h-3" /> These are keyword matches only - different intent/customers. NOT rejection factors.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </PrintCard>
+            )}
+            
+            {/* Cultural Fit */}
+            {culturalAnalysis?.length > 0 && (
+                <PrintCard>
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                        <SubSectionHeader icon={Globe} title="Cultural Fit" />
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {culturalAnalysis.map((c, i) => {
+                                const flags = {'USA': '🇺🇸', 'India': '🇮🇳', 'UK': '🇬🇧', 'Germany': '🇩🇪', 'France': '🇫🇷', 'Japan': '🇯🇵', 'China': '🇨🇳'};
+                                return (
+                                    <div key={i} className="bg-gradient-to-br from-fuchsia-50 to-white border border-fuchsia-200 rounded-xl p-4 text-center">
+                                        <div className="text-3xl mb-2">{flags[c.country] || '🌍'}</div>
+                                        <h4 className="font-bold text-slate-800 text-sm">{c.country}</h4>
+                                        <div className="text-2xl font-black text-fuchsia-600 my-2">{c.cultural_resonance_score}/10</div>
+                                        <p className="text-xs text-slate-500">{c.cultural_notes}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </PrintCard>
+            )}
+        </div>
+    );
+};
+
+// ============ COMPETITIVE LANDSCAPE SECTION ============
+const CompetitiveLandscapeSection = ({ competitorAnalysis }) => {
+    if (!competitorAnalysis) return null;
+    
+    const competitors = competitorAnalysis.competitors || competitorAnalysis.true_market_competitors || [];
+    
+    return (
+        <div className="space-y-4">
+            {/* Positioning Matrix Visual */}
+            <PrintCard>
+                <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                    <SubSectionHeader icon={BarChart3} title="Strategic Positioning Matrix" />
+                    
+                    {/* Axis Labels */}
+                    <div className="text-center mb-4">
+                        <p className="text-xs text-slate-500">
+                            X: {competitorAnalysis.x_axis_label || 'Price: Budget → Luxury'} | Y: {competitorAnalysis.y_axis_label || 'Style: Classic → Avant-Garde'}
+                        </p>
+                    </div>
+                    
+                    {/* Visual Matrix */}
+                    <div className="relative bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-xl p-4 h-80">
+                        {/* Grid lines */}
+                        <div className="absolute inset-4 border-l border-b border-slate-300"></div>
+                        <div className="absolute left-1/2 top-4 bottom-4 border-l border-dashed border-slate-200"></div>
+                        <div className="absolute left-4 right-4 top-1/2 border-t border-dashed border-slate-200"></div>
+                        
+                        {/* Quadrant Labels */}
+                        <div className="absolute top-6 left-6 text-xs text-slate-400">Budget + Avant-Garde</div>
+                        <div className="absolute top-6 right-6 text-xs text-slate-400 text-right">Luxury + Avant-Garde</div>
+                        <div className="absolute bottom-6 left-6 text-xs text-slate-400">Budget + Classic</div>
+                        <div className="absolute bottom-6 right-6 text-xs text-slate-400 text-right">Luxury + Classic</div>
+                        
+                        {/* Plot competitors */}
+                        {competitors.slice(0, 6).map((comp, i) => {
+                            const x = (comp.x_coordinate || 50) / 100 * 80 + 10;
+                            const y = 100 - ((comp.y_coordinate || 50) / 100 * 80 + 10);
+                            return (
+                                <div
+                                    key={i}
+                                    className="absolute transform -translate-x-1/2 -translate-y-1/2 group"
+                                    style={{ left: `${x}%`, top: `${y}%` }}
+                                >
+                                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
+                                        {i + 1}
+                                    </div>
+                                    <div className="hidden group-hover:block absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-10">
+                                        {comp.name}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        
+                        {/* User brand position */}
+                        {competitorAnalysis.user_brand_position && (
+                            <div
+                                className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                                style={{
+                                    left: `${(competitorAnalysis.user_brand_position.x || 70) / 100 * 80 + 10}%`,
+                                    top: `${100 - ((competitorAnalysis.user_brand_position.y || 70) / 100 * 80 + 10)}%`
+                                }}
+                            >
+                                <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white">
+                                    YOU
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Legend */}
+                    <div className="mt-4 flex flex-wrap gap-3">
+                        {competitors.slice(0, 6).map((comp, i) => (
+                            <div key={i} className="flex items-center gap-2 text-xs">
+                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">{i + 1}</div>
+                                <span className="text-slate-600">{comp.name}</span>
+                                <Badge variant="outline" className="text-xs">{comp.quadrant || comp.price_position}</Badge>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </PrintCard>
+            
+            {/* White Space & Strategic Advantage */}
+            <PrintCard>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {competitorAnalysis.white_space_analysis && (
+                        <div className="bg-emerald-50 rounded-xl p-5 border border-emerald-200">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Lightbulb className="w-5 h-5 text-emerald-600" />
+                                <h4 className="font-bold text-emerald-700">White Space Analysis</h4>
+                            </div>
+                            <p className="text-sm text-slate-700">{competitorAnalysis.white_space_analysis}</p>
+                        </div>
+                    )}
+                    {competitorAnalysis.strategic_advantage && (
+                        <div className="bg-violet-50 rounded-xl p-5 border border-violet-200">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Target className="w-5 h-5 text-violet-600" />
+                                <h4 className="font-bold text-violet-700">Strategic Advantage</h4>
+                            </div>
+                            <p className="text-sm text-slate-700">{competitorAnalysis.strategic_advantage}</p>
+                        </div>
+                    )}
+                </div>
+            </PrintCard>
+            
+            {/* Recommended Pricing */}
+            {competitorAnalysis.suggested_pricing && (
+                <PrintCard>
+                    <div className="bg-amber-50 rounded-xl p-5 border border-amber-200">
+                        <div className="flex items-center gap-2 mb-3">
+                            <TrendingUp className="w-5 h-5 text-amber-600" />
+                            <h4 className="font-bold text-amber-700">Recommended Pricing</h4>
+                        </div>
+                        <p className="text-sm text-slate-700">{competitorAnalysis.suggested_pricing}</p>
+                    </div>
+                </PrintCard>
+            )}
+        </div>
+    );
+};
+
+// ============ LEGAL RISK MATRIX ============
+const LegalRiskMatrix = ({ trademarkMatrix, trademarkClasses }) => {
+    if (!trademarkMatrix) return null;
+    
+    const getZoneColor = (zone) => {
+        const z = (zone || '').toLowerCase();
+        if (z.includes('low')) return 'bg-emerald-100 text-emerald-700';
+        if (z.includes('medium')) return 'bg-amber-100 text-amber-700';
         return 'bg-red-100 text-red-700';
     };
     
-    // Extract position info
-    const position = competitor.quadrant || competitor.price_position || competitor.category_position;
-    const overlap = competitor.similarity || competitor.x_coordinate;
+    const risks = [
+        { key: 'genericness', label: 'Genericness', data: trademarkMatrix.genericness },
+        { key: 'existing_conflicts', label: 'Conflicts', data: trademarkMatrix.existing_conflicts },
+        { key: 'phonetic_similarity', label: 'Phonetic', data: trademarkMatrix.phonetic_similarity },
+        { key: 'class_crowding', label: 'Classes', data: trademarkMatrix.class_crowding },
+        { key: 'rebranding_probability', label: 'Rebranding', data: trademarkMatrix.rebranding_probability },
+    ].filter(r => r.data);
     
     return (
-        <PrintCard>
-            <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-50 rounded-full flex items-center justify-center text-lg">
-                        🏢
+        <div className="space-y-4">
+            <PrintCard>
+                <div className="bg-white rounded-2xl p-6 border border-slate-200">
+                    <SubSectionHeader icon={Scale} title="Legal Risk Assessment Matrix" />
+                    
+                    {/* Table */}
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-slate-50">
+                                    <th className="text-left p-3 font-bold text-slate-700">Risk Factor</th>
+                                    <th className="text-center p-3 font-bold text-slate-700">Probability</th>
+                                    <th className="text-center p-3 font-bold text-slate-700">Severity</th>
+                                    <th className="text-center p-3 font-bold text-slate-700">Zone</th>
+                                    <th className="text-left p-3 font-bold text-slate-700">Mitigation Strategy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {risks.map((risk, i) => (
+                                    <tr key={i} className="border-t border-slate-100">
+                                        <td className="p-3 font-semibold text-slate-800">{risk.label}</td>
+                                        <td className="p-3 text-center">
+                                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 font-bold">
+                                                {risk.data.probability}/10
+                                            </span>
+                                        </td>
+                                        <td className="p-3 text-center">
+                                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 font-bold">
+                                                {risk.data.severity}/10
+                                            </span>
+                                        </td>
+                                        <td className="p-3 text-center">
+                                            <Badge className={getZoneColor(risk.data.zone)}>{risk.data.zone}</Badge>
+                                        </td>
+                                        <td className="p-3 text-xs text-slate-600">{risk.data.mitigation}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <h4 className="font-bold text-slate-800">{competitor.name}</h4>
-                        <p className="text-xs text-slate-500">
-                            {position && <span>{position}</span>}
-                            {overlap && <span> • {typeof overlap === 'number' ? `${overlap}%` : overlap} position</span>}
-                        </p>
-                    </div>
                 </div>
-                <Badge className={`${getRiskColor(competitor.conflict_level || competitor.risk)} font-bold`}>
-                    {competitor.conflict_level || competitor.risk || competitor.quadrant || 'Competitor'}
-                </Badge>
-            </div>
-        </PrintCard>
-    );
-};
-
-// ============ DOMAIN CARD ============
-const DomainCard = ({ domain, status, note }) => {
-    const isAvailable = status?.toLowerCase().includes('available') || status?.toLowerCase().includes('free');
-    
-    return (
-        <PrintCard>
-            <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                    <span className="font-mono font-bold text-slate-800">{domain}</span>
-                </div>
-                <div className="text-right">
-                    <Badge className={isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}>
-                        {isAvailable ? '✓ Available' : '✗ Taken'}
-                    </Badge>
-                    {note && <p className="text-xs text-slate-500 mt-1">{note}</p>}
-                </div>
-            </div>
-        </PrintCard>
-    );
-};
-
-// ============ CULTURAL CARD ============
-const CulturalCard = ({ country, score, notes }) => {
-    const flags = {
-        'USA': '🇺🇸', 'India': '🇮🇳', 'UK': '🇬🇧', 'Germany': '🇩🇪', 
-        'France': '🇫🇷', 'Japan': '🇯🇵', 'China': '🇨🇳', 'Brazil': '🇧🇷',
-        'Canada': '🇨🇦', 'Australia': '🇦🇺'
-    };
-    
-    return (
-        <PrintCard>
-            <div className="bg-gradient-to-br from-fuchsia-50 to-white border border-fuchsia-200 rounded-xl p-4 text-center">
-                <div className="text-3xl mb-2">{flags[country] || '🌍'}</div>
-                <h4 className="font-bold text-slate-800 mb-1">{country}</h4>
-                <div className="text-2xl font-black text-fuchsia-600 mb-2">{score}/10</div>
-                <p className="text-xs text-slate-500">{notes}</p>
-            </div>
-        </PrintCard>
-    );
-};
-
-// ============ FINAL VERDICT BANNER ============
-const FinalVerdictBanner = ({ verdict, score, assessment }) => {
-    const getStyle = () => {
-        if (verdict === 'GO') return 'from-emerald-500 via-teal-500 to-cyan-500';
-        if (verdict === 'CONDITIONAL GO') return 'from-amber-500 via-orange-500 to-yellow-500';
-        return 'from-red-500 via-rose-500 to-pink-500';
-    };
-    
-    return (
-        <PrintCard>
-            <div className={`bg-gradient-to-r ${getStyle()} rounded-2xl p-8 text-white print:p-6`}>
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center print:w-12 print:h-12">
-                            <Zap className="w-8 h-8 print:w-6 print:h-6" />
+            </PrintCard>
+            
+            {/* Nice Classes */}
+            {trademarkClasses && (
+                <PrintCard>
+                    <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
+                        <div className="flex items-center gap-2 mb-3">
+                            <FileText className="w-5 h-5 text-blue-600" />
+                            <h4 className="font-bold text-blue-700">Recommended NICE Classes for Filing</h4>
                         </div>
-                        <div>
-                            <p className="text-sm uppercase tracking-widest opacity-80">Final Verdict</p>
-                            <h2 className="text-3xl font-black print:text-2xl">{verdict}</h2>
-                        </div>
+                        <p className="text-sm text-slate-700">{trademarkClasses}</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-center px-4 py-2 bg-white/20 rounded-xl">
-                            <p className="text-xs opacity-80">Score</p>
-                            <p className="text-2xl font-black">{score}/100</p>
+                </PrintCard>
+            )}
+            
+            {/* Overall Assessment */}
+            {trademarkMatrix.overall_assessment && (
+                <PrintCard>
+                    <div className="bg-emerald-50 rounded-xl p-5 border border-emerald-200">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Shield className="w-5 h-5 text-emerald-600" />
+                            <h4 className="font-bold text-emerald-700">Overall Assessment</h4>
                         </div>
+                        <p className="text-sm text-slate-700">{trademarkMatrix.overall_assessment}</p>
                     </div>
-                </div>
-                {assessment?.bottom_line && (
-                    <p className="mt-4 text-white/90 text-sm border-t border-white/20 pt-4">
-                        {assessment.bottom_line}
-                    </p>
-                )}
-            </div>
-        </PrintCard>
+                </PrintCard>
+            )}
+        </div>
     );
 };
 
 // ============ LOCKED SECTION ============
-const LockedSection = ({ title, teaser, icon: Icon, onUnlock }) => (
+const LockedSection = ({ title, onUnlock }) => (
     <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-gradient-to-br from-slate-50 to-white print:hidden">
-        <div className="p-8 filter blur-sm opacity-50 pointer-events-none select-none">
+        <div className="p-8 filter blur-sm opacity-50">
             <div className="h-4 w-3/4 bg-slate-200 rounded mb-3"></div>
             <div className="h-4 w-1/2 bg-slate-200 rounded mb-3"></div>
-            <div className="h-20 w-full bg-slate-100 rounded mb-3"></div>
+            <div className="h-20 w-full bg-slate-100 rounded"></div>
         </div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-[2px]">
-            <div className="text-center px-6 py-8 max-w-sm">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-2xl flex items-center justify-center">
-                    <Lock className="w-8 h-8 text-violet-600" />
-                </div>
-                <h3 className="text-xl font-black text-slate-900 mb-2">{title}</h3>
-                <p className="text-sm text-slate-500 mb-6">{teaser}</p>
-                <Button onClick={onUnlock} className="bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white font-bold rounded-xl px-6">
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Register to Unlock
-                </Button>
-            </div>
-        </div>
-    </div>
-);
-
-// ============ REGISTER CTA BANNER ============
-const RegisterCTABanner = ({ onRegister }) => (
-    <div className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-orange-500 rounded-2xl p-6 text-white mb-8 shadow-xl print:hidden">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Lock className="w-6 h-6" />
-                </div>
-                <div>
-                    <h3 className="text-lg font-black">Unlock Your Full Report</h3>
-                    <p className="text-sm text-white/80">Register free to see detailed analysis</p>
-                </div>
-            </div>
-            <Button onClick={onRegister} className="bg-white text-violet-700 hover:bg-slate-100 font-bold rounded-xl px-6">
-                Register Now — It's Free
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80">
+            <Lock className="w-12 h-12 text-violet-400 mb-3" />
+            <h3 className="text-lg font-bold text-slate-800 mb-2">{title}</h3>
+            <Button onClick={onUnlock} className="bg-violet-600 hover:bg-violet-700 text-white">
+                <Sparkles className="w-4 h-4 mr-2" /> Register to Unlock
             </Button>
         </div>
     </div>
@@ -377,9 +868,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     
     const isAuthenticated = !!user;
-    const currentDate = new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', month: 'long', day: 'numeric' 
-    });
+    const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     useEffect(() => {
         if (location.state?.data) {
@@ -408,13 +897,13 @@ const Dashboard = () => {
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-slate-600 font-medium">Loading Report...</p>
+                    <p className="text-slate-600">Loading Report...</p>
                 </div>
             </div>
         );
     }
 
-    if (!reportData) {
+    if (!reportData || !reportData.brand_scores?.[0]) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="text-center p-8 bg-white rounded-2xl shadow-lg">
@@ -427,67 +916,24 @@ const Dashboard = () => {
 
     const data = reportData;
     const query = queryData || {};
-    const brand = data.brand_scores?.[0];
-
-    if (!brand) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="text-center p-8 bg-white rounded-2xl shadow-lg">
-                    <h2 className="text-xl font-bold text-slate-800 mb-4">Invalid Report Data</h2>
-                    <Button onClick={() => navigate('/')}>Return Home</Button>
-                </div>
-            </div>
-        );
-    }
-
-    const lockedSections = {
-        strategy: { title: "Strategy Snapshot", teaser: "Discover your brand's strategic classification..." },
-        dimensions: { title: "Dimensions Analysis", teaser: "See how your brand scores across 8 key frameworks..." },
-        trademark: { title: "Legal Risk Matrix", teaser: "Understand potential trademark conflicts..." },
-        domain: { title: "Digital Presence", teaser: "Check domain and social media availability..." },
-        competitor: { title: "Competitive Landscape", teaser: "See who you're competing against..." },
-        cultural: { title: "Cultural Analysis", teaser: "Understand how your brand resonates globally..." },
-    };
+    const brand = data.brand_scores[0];
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 print:bg-white">
             {/* Print Styles */}
             <style>{`
                 @media print {
-                    @page { 
-                        size: A4 portrait; 
-                        margin: 15mm; 
-                    }
-                    body { 
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important;
-                    }
-                    .print-card { 
-                        break-inside: avoid !important; 
-                        page-break-inside: avoid !important;
-                    }
-                    .print-section {
-                        break-before: auto;
-                        page-break-before: auto;
-                    }
-                    .print-section-header {
-                        break-after: avoid !important;
-                        page-break-after: avoid !important;
-                    }
+                    @page { size: A4 portrait; margin: 12mm; }
+                    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .print-card { break-inside: avoid !important; page-break-inside: avoid !important; margin-bottom: 8px; }
                     .no-print { display: none !important; }
                 }
             `}</style>
 
-            {/* Cover Page (Print Only) */}
-            <CoverPage 
-                brandName={brand.brand_name}
-                score={brand.namescore}
-                verdict={brand.verdict}
-                date={currentDate}
-                query={query}
-            />
+            {/* Cover Page */}
+            <CoverPage brandName={brand.brand_name} score={brand.namescore} verdict={brand.verdict} date={currentDate} query={query} />
 
-            {/* Screen Navbar */}
+            {/* Navbar */}
             <div className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center no-print sticky top-0 z-50">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full">
@@ -499,295 +945,183 @@ const Dashboard = () => {
                     <Badge variant="outline" className="hidden md:flex">{query.category} • {query.market_scope}</Badge>
                     {isAuthenticated ? (
                         <Button onClick={() => window.print()} className="gap-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl">
-                            <Printer className="h-4 w-4" />
-                            Export PDF
+                            <Printer className="h-4 w-4" /> Export PDF
                         </Button>
                     ) : (
                         <Button onClick={handleRegister} className="gap-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl">
-                            <Lock className="h-4 w-4" />
-                            Unlock Full Report
+                            <Lock className="h-4 w-4" /> Unlock Full Report
                         </Button>
                     )}
                 </div>
             </div>
 
             {/* Print Header */}
-            <div className="hidden print:block px-6 py-4 border-b-2 border-slate-200 mb-6">
-                <div className="flex justify-between items-center">
-                    <img src={LOGO_URL} alt="RIGHTNAME" className="h-6" />
-                    <span className="text-sm text-slate-500">{currentDate}</span>
-                </div>
+            <div className="hidden print:flex print:justify-between print:items-center print:px-4 print:py-2 print:border-b print:border-slate-200 print:mb-4">
+                <img src={LOGO_URL} alt="RIGHTNAME" className="h-5" />
+                <span className="text-xs text-slate-500">{currentDate}</span>
             </div>
 
             {/* Main Content */}
-            <main className="max-w-5xl mx-auto px-6 py-8 space-y-10 print:px-0 print:py-0 print:space-y-6">
+            <main className="max-w-5xl mx-auto px-6 py-8 space-y-8 print:px-2 print:py-2 print:space-y-4">
                 
                 {/* CTA Banner */}
-                {!isAuthenticated && <RegisterCTABanner onRegister={handleRegister} />}
+                {!isAuthenticated && (
+                    <div className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-orange-500 rounded-2xl p-6 text-white no-print">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <Lock className="w-10 h-10 opacity-80" />
+                                <div>
+                                    <h3 className="text-lg font-bold">Unlock Full Report</h3>
+                                    <p className="text-sm opacity-80">Register free to see all sections</p>
+                                </div>
+                            </div>
+                            <Button onClick={handleRegister} className="bg-white text-violet-700 hover:bg-slate-100 font-bold">
+                                Register Now
+                            </Button>
+                        </div>
+                    </div>
+                )}
 
-                {/* ===== SECTION 1: HERO ===== */}
+                {/* SECTION 1: HERO */}
                 <section className="print-section">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:gap-4">
-                        {/* Brand Info */}
                         <div className="lg:col-span-2">
                             <PrintCard>
                                 <div className="bg-white rounded-2xl p-6 border border-slate-200 print:p-4">
-                                    <h1 className="text-5xl font-black text-slate-900 mb-3 print:text-4xl">
-                                        {brand.brand_name}
-                                    </h1>
+                                    <h1 className="text-5xl font-black text-slate-900 mb-3 print:text-4xl">{brand.brand_name}</h1>
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         <Badge className="bg-slate-900 text-white font-bold">{brand.verdict}</Badge>
-                                        <Badge variant="outline">{brand.positioning_fit} positioning</Badge>
-                                        {!isAuthenticated && (
-                                            <Badge className="bg-amber-100 text-amber-700 no-print">
-                                                <Lock className="w-3 h-3 mr-1" /> Preview
-                                            </Badge>
-                                        )}
+                                        <Badge variant="outline">{brand.positioning_fit}</Badge>
                                     </div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <Star className="w-4 h-4 text-amber-500" />
                                         <span className="text-xs font-bold uppercase tracking-widest text-amber-600">Executive Summary</span>
                                     </div>
-                                    <p className="text-slate-700 leading-relaxed print:text-sm">
-                                        {data.executive_summary}
-                                    </p>
+                                    <p className="text-slate-700 leading-relaxed print:text-sm">{data.executive_summary}</p>
                                 </div>
                             </PrintCard>
                         </div>
-                        
-                        {/* Score Card */}
                         <div>
                             <ScoreCardRevamped score={brand.namescore} verdict={brand.verdict} />
                         </div>
                     </div>
                 </section>
 
-                {/* ===== SECTION 2: QUICK DIMENSIONS ===== */}
+                {/* SECTION 2: QUICK DIMENSIONS */}
                 <section className="print-section">
-                    <div className="print-section-header">
-                        <SectionHeader icon={BarChart3} title="Quick Dimensions" subtitle="Framework scores at a glance" color="violet" />
-                    </div>
-                    {isAuthenticated ? (
-                        <PrintCard>
-                            <div className="bg-white rounded-2xl p-6 border border-slate-200 print:p-4">
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 print:gap-3">
-                                    {brand.dimensions?.slice(0, 6).map((dim, i) => (
-                                        <div key={i} className="p-3 bg-slate-50 rounded-xl">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-xs font-semibold text-slate-600 truncate max-w-[100px]">{dim.name}</span>
-                                                <span className="text-sm font-black text-slate-800">{dim.score}/10</span>
-                                            </div>
-                                            <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                                                <div 
-                                                    className={`h-full rounded-full ${
-                                                        dim.score >= 8 ? 'bg-emerald-500' : 
-                                                        dim.score >= 6 ? 'bg-violet-500' : 'bg-amber-500'
-                                                    }`}
-                                                    style={{ width: `${dim.score * 10}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </PrintCard>
-                    ) : (
-                        <LockedSection {...lockedSections.dimensions} onUnlock={handleRegister} />
-                    )}
+                    <QuickDimensionsGrid dimensions={brand.dimensions} />
                 </section>
 
-                {/* ===== SECTION 3: STRATEGY ===== */}
-                <section className="print-section">
-                    <div className="print-section-header">
-                        <SectionHeader icon={Target} title="Strategy Snapshot" subtitle="Strengths and risks analysis" color="emerald" />
-                    </div>
-                    {isAuthenticated ? (
-                        <>
-                            {brand.strategic_classification && (
-                                <PrintCard className="mb-4">
-                                    <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
-                                        <p className="text-lg font-bold text-violet-900 italic">"{brand.strategic_classification}"</p>
-                                    </div>
-                                </PrintCard>
-                            )}
-                            <StrengthsRisksCard pros={brand.pros} cons={brand.cons} />
-                        </>
-                    ) : (
-                        <LockedSection {...lockedSections.strategy} onUnlock={handleRegister} />
-                    )}
-                </section>
-
-                {/* ===== SECTION 4: DETAILED DIMENSIONS ===== */}
-                {isAuthenticated && brand.dimensions && (
+                {/* SECTION 3: FINAL ASSESSMENT */}
+                {brand.final_assessment && (
                     <section className="print-section">
-                        <div className="print-section-header">
-                            <SectionHeader icon={BarChart3} title="Detailed Framework Analysis" subtitle="In-depth scoring breakdown" color="fuchsia" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:gap-3">
-                            {brand.dimensions.map((dim, i) => (
-                                <DimensionCard key={i} dimension={dim} index={i} />
-                            ))}
-                        </div>
+                        <SectionHeader icon={Zap} title="Final Assessment" subtitle="Consultant Verdict & Roadmap" color="emerald" />
+                        {isAuthenticated ? (
+                            <FinalAssessmentFull assessment={brand.final_assessment} verdict={brand.verdict} score={brand.namescore} />
+                        ) : (
+                            <LockedSection title="Final Assessment" onUnlock={handleRegister} />
+                        )}
                     </section>
                 )}
 
-                {/* ===== SECTION 5: COMPETITORS ===== */}
+                {/* SECTION 4: STRATEGY SNAPSHOT */}
+                <section className="print-section">
+                    <SectionHeader icon={Target} title="Strategy Snapshot" subtitle="Strengths and risks analysis" color="emerald" />
+                    {isAuthenticated ? (
+                        <StrategySnapshot classification={brand.strategic_classification} pros={brand.pros} cons={brand.cons} />
+                    ) : (
+                        <LockedSection title="Strategy Snapshot" onUnlock={handleRegister} />
+                    )}
+                </section>
+
+                {/* SECTION 5: DETAILED DIMENSIONS */}
+                {brand.dimensions && (
+                    <section className="print-section">
+                        <SectionHeader icon={BarChart3} title="Detailed Framework Analysis" subtitle="In-depth scoring breakdown" color="fuchsia" />
+                        {isAuthenticated ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:gap-3">
+                                {brand.dimensions.map((dim, i) => (
+                                    <DetailedDimensionCard key={i} dimension={dim} index={i} />
+                                ))}
+                            </div>
+                        ) : (
+                            <LockedSection title="Detailed Framework Analysis" onUnlock={handleRegister} />
+                        )}
+                    </section>
+                )}
+
+                {/* SECTION 6: DIGITAL PRESENCE */}
+                {(brand.multi_domain_availability || brand.social_availability) && (
+                    <section className="print-section">
+                        <SectionHeader icon={Globe} title="Digital Presence Check" subtitle="Domain & social availability" color="cyan" badge={`${brand.multi_domain_availability?.category_domains?.filter(d => d.available).length || 0}/${brand.multi_domain_availability?.category_domains?.length || 0} Available`} />
+                        {isAuthenticated ? (
+                            <DigitalPresenceSection 
+                                multiDomain={brand.multi_domain_availability} 
+                                domainAnalysis={brand.domain_analysis}
+                                socialAvailability={brand.social_availability}
+                            />
+                        ) : (
+                            <LockedSection title="Digital Presence Check" onUnlock={handleRegister} />
+                        )}
+                    </section>
+                )}
+
+                {/* SECTION 7: MARKET INTELLIGENCE */}
+                {(brand.domain_analysis || brand.visibility_analysis || brand.cultural_analysis) && (
+                    <section className="print-section">
+                        <SectionHeader icon={TrendingUp} title="Market Intelligence" subtitle="Domain status, conflicts & cultural fit" color="amber" />
+                        {isAuthenticated ? (
+                            <MarketIntelligenceSection 
+                                domainAnalysis={brand.domain_analysis}
+                                visibilityAnalysis={brand.visibility_analysis}
+                                culturalAnalysis={brand.cultural_analysis}
+                            />
+                        ) : (
+                            <LockedSection title="Market Intelligence" onUnlock={handleRegister} />
+                        )}
+                    </section>
+                )}
+
+                {/* SECTION 8: COMPETITIVE LANDSCAPE */}
                 {brand.competitor_analysis && (
                     <section className="print-section">
-                        <div className="print-section-header">
-                            <SectionHeader icon={Users} title="Competitive Landscape" subtitle="Market overlap analysis" color="blue" />
-                        </div>
+                        <SectionHeader icon={Users} title="Competitive Landscape" subtitle="Strategic positioning matrix" color="blue" />
                         {isAuthenticated ? (
-                            <div className="space-y-3">
-                                {/* Support both data structures */}
-                                {(brand.competitor_analysis.competitors || brand.competitor_analysis.true_market_competitors)?.slice(0, 6).map((comp, i) => (
-                                    <CompetitorCard key={i} competitor={comp} />
-                                ))}
-                                {/* Positioning Matrix Info */}
-                                {(brand.competitor_analysis.x_axis_label || brand.competitor_analysis.y_axis_label) && (
-                                    <PrintCard>
-                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                                            <p className="text-sm text-blue-700">
-                                                <strong>Positioning Matrix:</strong> {brand.competitor_analysis.x_axis_label} vs {brand.competitor_analysis.y_axis_label}
-                                            </p>
-                                        </div>
-                                    </PrintCard>
-                                )}
-                                {brand.competitor_analysis.analysis_note && (
-                                    <PrintCard>
-                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                                            <p className="text-sm text-blue-700">{brand.competitor_analysis.analysis_note}</p>
-                                        </div>
-                                    </PrintCard>
-                                )}
-                            </div>
+                            <CompetitiveLandscapeSection competitorAnalysis={brand.competitor_analysis} />
                         ) : (
-                            <LockedSection {...lockedSections.competitor} onUnlock={handleRegister} />
+                            <LockedSection title="Competitive Landscape" onUnlock={handleRegister} />
                         )}
                     </section>
                 )}
 
-                {/* ===== SECTION 6: DOMAINS ===== */}
-                {(brand.multi_domain_availability || brand.domain_analysis) && (
+                {/* SECTION 9: LEGAL RISK MATRIX */}
+                {brand.trademark_matrix && (
                     <section className="print-section">
-                        <div className="print-section-header">
-                            <SectionHeader icon={Globe} title="Digital Presence" subtitle="Domain & social availability" color="amber" />
-                        </div>
+                        <SectionHeader icon={Scale} title="Legal Risk Matrix" subtitle="IP Analysis & Trademark Assessment" color="red" />
                         {isAuthenticated ? (
-                            <div className="space-y-3">
-                                {/* Category Domains */}
-                                {brand.multi_domain_availability?.category_domains?.map((d, i) => (
-                                    <DomainCard key={`cat-${i}`} domain={d.domain} status={d.status || (d.available ? 'Available' : 'Taken')} />
-                                ))}
-                                {/* Country Domains */}
-                                {brand.multi_domain_availability?.country_domains?.map((d, i) => (
-                                    <DomainCard key={`country-${i}`} domain={d.domain} status={d.status || (d.available ? 'Available' : 'Taken')} />
-                                ))}
-                                {/* Fallback: domains array */}
-                                {brand.multi_domain_availability?.domains?.map((d, i) => (
-                                    <DomainCard key={`dom-${i}`} domain={d.domain} status={d.status} note={d.registrar} />
-                                ))}
-                                {/* Domain alternatives from domain_analysis */}
-                                {brand.domain_analysis?.alternatives?.map((alt, i) => (
-                                    <DomainCard key={`alt-${i}`} domain={alt.domain || alt} status={alt.status || 'Suggested'} />
-                                ))}
-                                {/* Domain Strategy Note */}
-                                {brand.domain_analysis?.strategy_note && (
-                                    <PrintCard>
-                                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                            <p className="text-sm text-amber-700">
-                                                <strong>💡 Strategy:</strong> {brand.domain_analysis.strategy_note}
-                                            </p>
-                                        </div>
-                                    </PrintCard>
-                                )}
-                                {/* Exact Match Status */}
-                                {brand.domain_analysis?.exact_match_status && (
-                                    <PrintCard>
-                                        <div className={`rounded-xl p-4 ${brand.domain_analysis.exact_match_status === 'AVAILABLE' ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}`}>
-                                            <p className={`text-sm ${brand.domain_analysis.exact_match_status === 'AVAILABLE' ? 'text-emerald-700' : 'text-red-700'}`}>
-                                                <strong>.com Status:</strong> {brand.domain_analysis.exact_match_status} 
-                                                {brand.domain_analysis.risk_level && ` (Risk: ${brand.domain_analysis.risk_level})`}
-                                            </p>
-                                        </div>
-                                    </PrintCard>
-                                )}
-                            </div>
+                            <LegalRiskMatrix trademarkMatrix={brand.trademark_matrix} trademarkClasses={brand.trademark_classes} />
                         ) : (
-                            <LockedSection {...lockedSections.domain} onUnlock={handleRegister} />
+                            <LockedSection title="Legal Risk Matrix" onUnlock={handleRegister} />
                         )}
                     </section>
                 )}
 
-                {/* ===== SECTION 7: CULTURAL ===== */}
-                {brand.cultural_analysis && (
-                    <section className="print-section">
-                        <div className="print-section-header">
-                            <SectionHeader icon={Globe} title="Cultural Resonance" subtitle="Global market fit" color="fuchsia" />
-                        </div>
-                        {isAuthenticated ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 print:gap-3">
-                                {brand.cultural_analysis.map((c, i) => (
-                                    <CulturalCard key={i} country={c.country} score={c.cultural_resonance_score} notes={c.cultural_notes} />
-                                ))}
-                            </div>
-                        ) : (
-                            <LockedSection {...lockedSections.cultural} onUnlock={handleRegister} />
-                        )}
-                    </section>
-                )}
-
-                {/* ===== SECTION 8: FINAL VERDICT ===== */}
-                {isAuthenticated && brand.final_assessment && (
-                    <section className="print-section">
-                        <div className="print-section-header">
-                            <SectionHeader icon={Zap} title="Final Assessment" subtitle="Conclusive recommendation" color="emerald" />
-                        </div>
-                        <FinalVerdictBanner 
-                            verdict={brand.verdict} 
-                            score={brand.namescore} 
-                            assessment={brand.final_assessment}
-                        />
-                        {brand.final_assessment.recommended_next_steps && (
-                            <PrintCard className="mt-4">
-                                <div className="bg-white border border-slate-200 rounded-xl p-5">
-                                    <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
-                                        <FileText className="w-4 h-4 text-violet-500" />
-                                        Recommended Next Steps
-                                    </h4>
-                                    <ul className="space-y-2">
-                                        {brand.final_assessment.recommended_next_steps.map((step, i) => (
-                                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                                                <span className="text-violet-500 font-bold">{i + 1}.</span>
-                                                {step}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </PrintCard>
-                        )}
-                    </section>
-                )}
-
-                {/* ===== BOTTOM CTA ===== */}
+                {/* Bottom CTA */}
                 {!isAuthenticated && (
-                    <section className="no-print">
-                        <div className="text-center p-8 bg-white rounded-2xl border-2 border-dashed border-violet-200">
+                    <section className="no-print text-center py-8">
+                        <div className="inline-block p-8 bg-white rounded-2xl border-2 border-dashed border-violet-200">
                             <Lock className="w-12 h-12 mx-auto mb-4 text-violet-400" />
                             <h3 className="text-2xl font-black text-slate-900 mb-2">Want the full picture?</h3>
-                            <p className="text-slate-500 mb-6 max-w-md mx-auto">
-                                Register for free to unlock all sections including trademark analysis, competitor insights, and strategic recommendations.
-                            </p>
+                            <p className="text-slate-500 mb-6 max-w-md">Register free to unlock all sections</p>
                             <Button onClick={handleRegister} size="lg" className="bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white font-bold rounded-xl px-8">
-                                <Sparkles className="w-5 h-5 mr-2" />
-                                Unlock Full Report — Free
+                                <Sparkles className="w-5 h-5 mr-2" /> Unlock Full Report
                             </Button>
                         </div>
                     </section>
                 )}
 
                 {/* Print Footer */}
-                <div className="hidden print:block mt-8 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
+                <div className="hidden print:block mt-4 pt-2 border-t border-slate-200 text-center text-xs text-slate-400">
                     <p>Generated by RIGHTNAME • {currentDate} • rightname.ai</p>
                 </div>
             </main>
