@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     // Email/Password Registration
     const registerWithEmail = async (email, password, name) => {
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     // Email/Password Login
     const loginWithEmail = async (email, password) => {
         try {
-            const response = await fetch('/api/auth/login/email', {
+            const response = await fetch(`${API_URL}/auth/login/email`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
