@@ -207,8 +207,16 @@ def calculate_phonetic_similarity(name1: str, name2: str) -> Tuple[bool, str]:
     """
     Check if two names sound the same using phonetic algorithms
     Returns (is_match, explanation)
+    
+    IMPORTANT: Only return match if names are reasonably similar in length
+    to avoid false positives like HeadBook matching HDFC
     """
     n1, n2 = normalize_name(name1), normalize_name(name2)
+    
+    # Length check - avoid matching very different length names
+    len_ratio = min(len(n1), len(n2)) / max(len(n1), len(n2)) if max(len(n1), len(n2)) > 0 else 0
+    if len_ratio < 0.5:  # Names are too different in length
+        return False, f"Length mismatch - not a phonetic conflict"
     
     # Soundex comparison
     soundex1 = jellyfish.soundex(n1.replace(" ", ""))
@@ -221,14 +229,68 @@ def calculate_phonetic_similarity(name1: str, name2: str) -> Tuple[bool, str]:
     soundex_match = soundex1 == soundex2
     metaphone_match = metaphone1 == metaphone2
     
-    if soundex_match and metaphone_match:
-        return True, f"PHONETIC MATCH: Both Soundex ({soundex1}) and Metaphone ({metaphone1}) codes are identical"
-    elif soundex_match:
-        return True, f"SOUNDEX MATCH: Same Soundex code ({soundex1})"
-    elif metaphone_match:
-        return True, f"METAPHONE MATCH: Same Metaphone code ({metaphone1})"
+    # Additional check: First 2 letters should be similar for phonetic match to count
+    first_letter_match = n1[:2].lower() == n2[:2].lower() if len(n1) >= 2 and len(n2) >= 2 else False
     
-    return False, f"No phonetic match (Soundex: {soundex1} vs {soundex2}, Metaphone: {metaphone1} vs {metaphone2})"
+    if soundex_match and metaphone_match and first_letter_match:
+        return True, f"PHONETIC MATCH: Both Soundex ({soundex1}) and Metaphone ({metaphone1}) codes are identical"
+    elif (soundex_match or metaphone_match) and first_letter_match:
+        if soundex_match:
+            return True, f"SOUNDEX MATCH: Same Soundex code ({soundex1})"
+        else:
+            return True, f"METAPHONE MATCH: Same Metaphone code ({metaphone1})"
+    
+    return False, f"No phonetic match"
+
+
+def check_suffix_conflict(input_name: str, industry: str, category: str) -> Dict:
+    """
+    Check if the brand name shares a suffix with a major brand in the same industry.
+    
+    Examples:
+    - "AuraKind" in pharma → matches "Mankind" due to "-kind" suffix
+    - "HeadBook" in social media → matches "Facebook" due to "-book" suffix
+    """
+    input_lower = input_name.lower()
+    conflicts = []
+    
+    # Determine which industry to check
+    industry_key = None
+    category_lower = category.lower() if category else ""
+    
+    # Map category to suffix industry
+    if "pharma" in category_lower or "health" in industry.lower():
+        industry_key = "Healthcare & Pharma"
+    elif "social" in category_lower or "media" in category_lower or "platform" in category_lower:
+        industry_key = "Social Media & Platforms"
+    elif "finance" in industry.lower() or "bank" in category_lower:
+        industry_key = "Finance & Banking"
+    elif "tech" in industry.lower() or "software" in category_lower:
+        industry_key = "Technology & Software"
+    
+    # Check against suffix-brand map (most important)
+    for suffix, brands in SUFFIX_BRAND_MAP.items():
+        if input_lower.endswith(suffix):
+            for brand in brands:
+                # Check if this brand is relevant to the industry
+                is_relevant = True
+                if suffix == "kind" and "pharma" not in category_lower and "health" not in industry.lower():
+                    is_relevant = False
+                if suffix in ["book", "gram", "tube", "tok", "chat"] and "social" not in category_lower and "media" not in category_lower:
+                    is_relevant = False
+                    
+                if is_relevant:
+                    conflicts.append({
+                        "brand": brand,
+                        "suffix": suffix,
+                        "match_type": "SUFFIX_CONFLICT",
+                        "explanation": f"'{input_name}' shares the '-{suffix}' suffix with '{brand}'. In the {category} space, this creates high confusion risk."
+                    })
+    
+    return {
+        "has_suffix_conflict": len(conflicts) > 0,
+        "conflicts": conflicts
+    }
 
 
 def check_brand_similarity(
