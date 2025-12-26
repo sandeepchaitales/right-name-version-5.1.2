@@ -652,6 +652,265 @@ class BrandEvaluationTester:
             self.log_test("Trademark Research - Nexofy Exception", False, str(e))
             return False
 
+    def test_currency_single_country_usa(self):
+        """Test Case 1 - Single Country USA: All costs should be in USD ($)"""
+        payload = {
+            "brand_names": ["TestUSA"],
+            "category": "Technology",
+            "positioning": "Premium",
+            "market_scope": "Single Country",
+            "countries": ["USA"]
+        }
+        
+        try:
+            print(f"\n💰 Testing Currency Logic - Single Country USA...")
+            print(f"Expected: All costs in USD ($)")
+            
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=180
+            )
+            
+            print(f"Response Status: {response.status_code}")
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("Currency Test - USA HTTP Error", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("Currency Test - USA Structure", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                currency_issues = []
+                
+                # Test 1: Check registration_timeline.filing_cost
+                if "registration_timeline" in brand and brand["registration_timeline"]:
+                    timeline = brand["registration_timeline"]
+                    filing_cost = timeline.get("filing_cost", "")
+                    if filing_cost and "$" not in filing_cost:
+                        currency_issues.append(f"filing_cost should be in USD ($), got: {filing_cost}")
+                    
+                    # Test 2: Check registration_timeline.opposition_defense_cost
+                    defense_cost = timeline.get("opposition_defense_cost", "")
+                    if defense_cost and "$" not in defense_cost:
+                        currency_issues.append(f"opposition_defense_cost should be in USD ($), got: {defense_cost}")
+                
+                # Test 3: Check mitigation_strategies[].estimated_cost
+                if "mitigation_strategies" in brand and brand["mitigation_strategies"]:
+                    for i, strategy in enumerate(brand["mitigation_strategies"]):
+                        if isinstance(strategy, dict) and "estimated_cost" in strategy:
+                            cost = strategy["estimated_cost"]
+                            if cost and "$" not in cost:
+                                currency_issues.append(f"mitigation_strategies[{i}].estimated_cost should be in USD ($), got: {cost}")
+                
+                # Test 4: Check for any INR (₹) or other currencies that shouldn't be there
+                response_text = json.dumps(data).lower()
+                if "₹" in response_text or "inr" in response_text:
+                    currency_issues.append("Found INR (₹) currency in USA single-country response")
+                if "£" in response_text or "gbp" in response_text:
+                    currency_issues.append("Found GBP (£) currency in USA single-country response")
+                if "€" in response_text or "eur" in response_text:
+                    currency_issues.append("Found EUR (€) currency in USA single-country response")
+                
+                if currency_issues:
+                    self.log_test("Currency Test - USA Single Country", False, "; ".join(currency_issues))
+                    return False
+                
+                self.log_test("Currency Test - USA Single Country", True, "All costs correctly in USD ($)")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("Currency Test - USA JSON", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Currency Test - USA Timeout", False, "Request timed out after 180 seconds")
+            return False
+        except Exception as e:
+            self.log_test("Currency Test - USA Exception", False, str(e))
+            return False
+
+    def test_currency_single_country_india(self):
+        """Test Case 2 - Single Country India: All costs should be in INR (₹)"""
+        payload = {
+            "brand_names": ["TestIndia"],
+            "category": "Fashion",
+            "positioning": "Premium",
+            "market_scope": "Single Country",
+            "countries": ["India"]
+        }
+        
+        try:
+            print(f"\n💰 Testing Currency Logic - Single Country India...")
+            print(f"Expected: All costs in INR (₹)")
+            
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=180
+            )
+            
+            print(f"Response Status: {response.status_code}")
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("Currency Test - India HTTP Error", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("Currency Test - India Structure", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                currency_issues = []
+                
+                # Test 1: Check registration_timeline.filing_cost
+                if "registration_timeline" in brand and brand["registration_timeline"]:
+                    timeline = brand["registration_timeline"]
+                    filing_cost = timeline.get("filing_cost", "")
+                    if filing_cost and "₹" not in filing_cost and "inr" not in filing_cost.lower():
+                        currency_issues.append(f"filing_cost should be in INR (₹), got: {filing_cost}")
+                    
+                    # Test 2: Check registration_timeline.opposition_defense_cost
+                    defense_cost = timeline.get("opposition_defense_cost", "")
+                    if defense_cost and "₹" not in defense_cost and "inr" not in defense_cost.lower():
+                        currency_issues.append(f"opposition_defense_cost should be in INR (₹), got: {defense_cost}")
+                
+                # Test 3: Check mitigation_strategies[].estimated_cost
+                if "mitigation_strategies" in brand and brand["mitigation_strategies"]:
+                    for i, strategy in enumerate(brand["mitigation_strategies"]):
+                        if isinstance(strategy, dict) and "estimated_cost" in strategy:
+                            cost = strategy["estimated_cost"]
+                            if cost and "₹" not in cost and "inr" not in cost.lower():
+                                currency_issues.append(f"mitigation_strategies[{i}].estimated_cost should be in INR (₹), got: {cost}")
+                
+                # Test 4: Check for any USD ($) or other currencies that shouldn't be there
+                response_text = json.dumps(data)
+                if "$" in response_text and "usd" not in response_text.lower():
+                    # Check if it's actually USD symbol, not just any $ symbol
+                    import re
+                    usd_pattern = r'\$[\d,.]+'
+                    if re.search(usd_pattern, response_text):
+                        currency_issues.append("Found USD ($) currency in India single-country response")
+                if "£" in response_text or "gbp" in response_text.lower():
+                    currency_issues.append("Found GBP (£) currency in India single-country response")
+                if "€" in response_text or "eur" in response_text.lower():
+                    currency_issues.append("Found EUR (€) currency in India single-country response")
+                
+                if currency_issues:
+                    self.log_test("Currency Test - India Single Country", False, "; ".join(currency_issues))
+                    return False
+                
+                self.log_test("Currency Test - India Single Country", True, "All costs correctly in INR (₹)")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("Currency Test - India JSON", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Currency Test - India Timeout", False, "Request timed out after 180 seconds")
+            return False
+        except Exception as e:
+            self.log_test("Currency Test - India Exception", False, str(e))
+            return False
+
+    def test_currency_multiple_countries(self):
+        """Test Case 3 - Multiple Countries: All costs should be in USD ($)"""
+        payload = {
+            "brand_names": ["TestMulti"],
+            "category": "Technology",
+            "positioning": "Premium",
+            "market_scope": "Multi-Country",
+            "countries": ["USA", "India", "UK"]
+        }
+        
+        try:
+            print(f"\n💰 Testing Currency Logic - Multiple Countries...")
+            print(f"Expected: All costs in USD ($) since multiple countries selected")
+            
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=180
+            )
+            
+            print(f"Response Status: {response.status_code}")
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("Currency Test - Multi HTTP Error", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("Currency Test - Multi Structure", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                currency_issues = []
+                
+                # Test 1: Check registration_timeline.filing_cost
+                if "registration_timeline" in brand and brand["registration_timeline"]:
+                    timeline = brand["registration_timeline"]
+                    filing_cost = timeline.get("filing_cost", "")
+                    if filing_cost and "$" not in filing_cost:
+                        currency_issues.append(f"filing_cost should be in USD ($), got: {filing_cost}")
+                    
+                    # Test 2: Check registration_timeline.opposition_defense_cost
+                    defense_cost = timeline.get("opposition_defense_cost", "")
+                    if defense_cost and "$" not in defense_cost:
+                        currency_issues.append(f"opposition_defense_cost should be in USD ($), got: {defense_cost}")
+                
+                # Test 3: Check mitigation_strategies[].estimated_cost
+                if "mitigation_strategies" in brand and brand["mitigation_strategies"]:
+                    for i, strategy in enumerate(brand["mitigation_strategies"]):
+                        if isinstance(strategy, dict) and "estimated_cost" in strategy:
+                            cost = strategy["estimated_cost"]
+                            if cost and "$" not in cost:
+                                currency_issues.append(f"mitigation_strategies[{i}].estimated_cost should be in USD ($), got: {cost}")
+                
+                # Test 4: Check for mixed currencies (should not have INR, GBP, EUR in multi-country)
+                response_text = json.dumps(data).lower()
+                if "₹" in response_text or "inr" in response_text:
+                    currency_issues.append("Found INR (₹) currency in multi-country response (should be USD)")
+                if "£" in response_text or "gbp" in response_text:
+                    currency_issues.append("Found GBP (£) currency in multi-country response (should be USD)")
+                if "€" in response_text or "eur" in response_text:
+                    currency_issues.append("Found EUR (€) currency in multi-country response (should be USD)")
+                
+                if currency_issues:
+                    self.log_test("Currency Test - Multiple Countries", False, "; ".join(currency_issues))
+                    return False
+                
+                self.log_test("Currency Test - Multiple Countries", True, "All costs correctly in USD ($) for multi-country")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("Currency Test - Multi JSON", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Currency Test - Multi Timeout", False, "Request timed out after 180 seconds")
+            return False
+        except Exception as e:
+            self.log_test("Currency Test - Multi Exception", False, str(e))
+            return False
+
     def test_emergent_llm_key_smoke_test(self):
         """Smoke test for newly configured Emergent LLM key with TestBrand"""
         payload = {
