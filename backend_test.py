@@ -1359,15 +1359,18 @@ class BrandEvaluationTester:
 def main():
     tester = BrandEvaluationTester()
     
-    # Run only currency tests as per review request
-    print("🎯 FOCUSED TESTING: Currency Logic in RIGHTNAME Brand Evaluation API")
-    print("=" * 70)
+    # Run ACTUAL country-specific trademark cost tests as per review request
+    print("🎯 FOCUSED TESTING: ACTUAL Country-Specific Trademark Costs in RIGHTNAME API")
+    print("=" * 80)
+    print("🔍 TESTING: ACTUAL USPTO costs vs ACTUAL IP India costs (NOT currency conversion)")
+    print("=" * 80)
     success = tester.run_currency_tests_only()
     
     # Save detailed results
     with open('/app/backend_test_results.json', 'w') as f:
         json.dump({
-            "test_focus": "Currency Logic Testing",
+            "test_focus": "ACTUAL Country-Specific Trademark Costs Testing",
+            "description": "Testing ACTUAL trademark office costs (USPTO vs IP India) not just currency conversion",
             "summary": {
                 "tests_run": tester.tests_run,
                 "tests_passed": tester.tests_passed,
