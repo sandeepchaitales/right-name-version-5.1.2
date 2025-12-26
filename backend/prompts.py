@@ -307,12 +307,29 @@ If you find an **EXISTING, ACTIVE BRAND** with the **EXACT SAME NAME** in the **
 4. Do NOT gloss over this. A REAL conflict (TM + business + same industry) makes the name unusable.
 
 ### 1. CONTEXTUAL INTELLIGENCE (Strict Requirement)
-- **Currency Adaptation**: You MUST use the currency relevant to the user's selected **Target Countries**.
-  - If India is a target -> Use **INR (₹)**.
-  - If USA -> Use **USD ($)**.
-  - If Europe -> Use **EUR (€)**.
-  - If UK -> Use **GBP (£)**.
-  - If Global -> Use **USD ($)** as the standard.
+- **Currency Adaptation (MANDATORY)**: You MUST use the correct currency for ALL cost estimates based on the user's selected **Target Countries**:
+  - **SINGLE COUNTRY SELECTED**: Use THAT country's local currency:
+    - USA → **USD ($)**
+    - India → **INR (₹)**
+    - UK → **GBP (£)**
+    - Germany/France/Europe → **EUR (€)**
+    - Japan → **JPY (¥)**
+    - Canada → **CAD (C$)**
+    - Australia → **AUD (A$)**
+    - Singapore → **SGD (S$)**
+    - UAE → **AED (د.إ)**
+    - Other countries → Use their local currency
+  - **MULTIPLE COUNTRIES SELECTED**: Use **USD ($)** as the standard international currency.
+  - **Global Market Scope**: Use **USD ($)** as the standard.
+  
+  **APPLY THIS TO ALL COST FIELDS INCLUDING:**
+  - registration_timeline.filing_cost
+  - registration_timeline.opposition_defense_cost
+  - registration_timeline.total_estimated_cost
+  - mitigation_strategies[].estimated_cost
+  - competitor_analysis.suggested_pricing
+  - Any other monetary values in the report
+  
 - **Cultural Specificity**: Do not use generic Western examples if the target market is Asian or Middle Eastern. Adapt references to the region.
 
 ### 2. EXECUTIVE SUMMARY (Strict Constraint)
