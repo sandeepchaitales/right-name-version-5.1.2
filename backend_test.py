@@ -795,6 +795,10 @@ class BrandEvaluationTester:
             print("❌ API health check failed, stopping tests")
             return False
         
+        # PRIORITY: Test newly configured Emergent LLM key (as per review request)
+        print("\n🔑 PRIORITY TEST: Testing newly configured Emergent LLM key...")
+        self.test_emergent_llm_key_smoke_test()
+        
         # Test main evaluate endpoint
         self.test_evaluate_endpoint_structure()
         
