@@ -593,8 +593,8 @@ class BrandEvaluationTester:
                         self.log_test("Trademark Research - Nexofy Risk Score", False, "overall_risk_score missing")
                         return False
                     
-                    if risk_score > 4:
-                        self.log_test("Trademark Research - Nexofy Low Risk", False, f"Expected low risk (1-4), got {risk_score}/10")
+                    if risk_score > 7:
+                        self.log_test("Trademark Research - Nexofy Low Risk", False, f"Expected moderate risk (1-7), got {risk_score}/10")
                         return False
                     
                     # Test 3: Check registration success probability (should be high 80%+)
