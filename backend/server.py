@@ -307,6 +307,57 @@ USE THESE US-BASED COSTS IN YOUR RESPONSE:
 IMPORTANT: Use USD ($) for ALL cost estimates when multiple countries are selected.
 """
 
+def fix_llm_response_types(data: dict) -> dict:
+    """
+    Fix common type issues in LLM responses before Pydantic validation.
+    The LLM sometimes returns integers where strings are expected.
+    """
+    if not isinstance(data, dict):
+        return data
+    
+    # Fix brand_scores if present
+    if "brand_scores" in data and isinstance(data["brand_scores"], list):
+        for brand in data["brand_scores"]:
+            if isinstance(brand, dict):
+                # Fix domain_analysis.score_impact (int -> str)
+                if "domain_analysis" in brand and isinstance(brand["domain_analysis"], dict):
+                    da = brand["domain_analysis"]
+                    if "score_impact" in da and isinstance(da["score_impact"], (int, float)):
+                        da["score_impact"] = str(da["score_impact"])
+                
+                # Fix any other potential int/float fields that should be strings
+                if "risk_level" in brand and isinstance(brand.get("risk_level"), (int, float)):
+                    brand["risk_level"] = str(brand["risk_level"])
+                
+                # Fix trademark_research nested fields
+                if "trademark_research" in brand and isinstance(brand["trademark_research"], dict):
+                    tr = brand["trademark_research"]
+                    # Convert numeric risk scores to int if they're strings
+                    for field in ["overall_risk_score", "registration_success_probability", "opposition_probability"]:
+                        if field in tr and isinstance(tr[field], str):
+                            try:
+                                tr[field] = int(float(tr[field].replace("%", "").strip()))
+                            except:
+                                pass
+                
+                # Fix multi_domain_availability nested fields
+                if "multi_domain_availability" in brand and isinstance(brand["multi_domain_availability"], dict):
+                    mda = brand["multi_domain_availability"]
+                    # Fix category_domains
+                    if "category_domains" in mda and isinstance(mda["category_domains"], list):
+                        for dom in mda["category_domains"]:
+                            if isinstance(dom, dict) and "available" in dom:
+                                if isinstance(dom["available"], str):
+                                    dom["available"] = dom["available"].lower() == "true"
+                    # Fix country_domains
+                    if "country_domains" in mda and isinstance(mda["country_domains"], list):
+                        for dom in mda["country_domains"]:
+                            if isinstance(dom, dict) and "available" in dom:
+                                if isinstance(dom["available"], str):
+                                    dom["available"] = dom["available"].lower() == "true"
+    
+    return data
+
 def check_domain_availability(brand_name: str) -> str:
     domain = f"{brand_name.lower().replace(' ', '')}.com"
     try:
