@@ -145,6 +145,81 @@ const CoverPage = ({ brandName, score, verdict, date, query, reportId }) => {
     );
 };
 
+// ============ INPUT SUMMARY SECTION (For Screen View) ============
+const InputSummarySection = ({ query, brandName, reportId, date }) => {
+    const formatCountries = (countries) => {
+        if (!countries || countries.length === 0) return 'Not specified';
+        const countryFlags = {
+            'USA': '🇺🇸', 'United States': '🇺🇸', 'India': '🇮🇳', 'UK': '🇬🇧', 'United Kingdom': '🇬🇧',
+            'Germany': '🇩🇪', 'France': '🇫🇷', 'Canada': '🇨🇦', 'Australia': '🇦🇺', 'Japan': '🇯🇵',
+            'China': '🇨🇳', 'Singapore': '🇸🇬', 'UAE': '🇦🇪', 'Brazil': '🇧🇷', 'Mexico': '🇲🇽',
+            'Italy': '🇮🇹', 'Spain': '🇪🇸', 'South Korea': '🇰🇷', 'Netherlands': '🇳🇱', 'Switzerland': '🇨🇭'
+        };
+        return countries.map(c => `${countryFlags[c] || '🌍'} ${c}`).join(', ');
+    };
+
+    return (
+        <PrintCard>
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border border-slate-200 overflow-hidden">
+                <div className="bg-slate-800 px-6 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-slate-300" />
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Evaluation Request Summary</h3>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-slate-400">
+                        <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {date}
+                        </span>
+                        {reportId && (
+                            <span className="flex items-center gap-1">
+                                <Hash className="w-3 h-3" />
+                                {reportId}
+                            </span>
+                        )}
+                    </div>
+                </div>
+                <div className="p-6 print:p-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 print:grid-cols-4">
+                        <div className="space-y-1">
+                            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Brand Name</p>
+                            <p className="text-sm font-bold text-slate-900">{brandName}</p>
+                        </div>
+                        {query?.industry && (
+                            <div className="space-y-1">
+                                <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Industry</p>
+                                <p className="text-sm font-semibold text-slate-800">{query.industry}</p>
+                            </div>
+                        )}
+                        <div className="space-y-1">
+                            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Category</p>
+                            <p className="text-sm font-semibold text-slate-800">{query?.category || 'N/A'}</p>
+                        </div>
+                        {query?.product_type && (
+                            <div className="space-y-1">
+                                <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Product Type</p>
+                                <p className="text-sm font-semibold text-slate-800">{query.product_type}</p>
+                            </div>
+                        )}
+                        <div className="space-y-1">
+                            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Positioning</p>
+                            <p className="text-sm font-semibold text-slate-800">{query?.positioning || 'N/A'}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Market Scope</p>
+                            <p className="text-sm font-semibold text-slate-800">{query?.market_scope || 'N/A'}</p>
+                        </div>
+                        <div className="space-y-1 col-span-2">
+                            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium">Target Countries</p>
+                            <p className="text-sm font-semibold text-slate-800">{formatCountries(query?.countries)}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </PrintCard>
+    );
+};
+
 // ============ SCORE CARD ============
 const ScoreCardRevamped = ({ score, verdict }) => {
     const getStyle = () => {
