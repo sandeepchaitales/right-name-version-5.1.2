@@ -48,7 +48,14 @@ KNOWN_BRANDS = {
     "Healthcare & Pharma": [
         "Apollo", "Fortis", "Max", "Medanta", "AIIMS", "Cipla", "Sun Pharma",
         "Dr. Reddy's", "Lupin", "Ranbaxy", "Biocon", "Zydus", "Torrent", "Glenmark",
-        "Pfizer", "Johnson & Johnson", "GSK", "Novartis", "Roche", "AstraZeneca"
+        "Pfizer", "Johnson & Johnson", "GSK", "Novartis", "Roche", "AstraZeneca",
+        "Mankind", "Mankind Pharma", "Alkem", "Cadila", "Intas", "Macleods", "Abbott",
+        "Sanofi", "Merck", "Bayer", "Eli Lilly", "Bristol Myers", "Amgen", "Gilead"
+    ],
+    "Social Media & Platforms": [
+        "Facebook", "Instagram", "Twitter", "TikTok", "Snapchat", "LinkedIn", "Pinterest",
+        "Reddit", "Discord", "Telegram", "WhatsApp", "YouTube", "Twitch", "BeReal",
+        "Threads", "Mastodon", "Tumblr", "Quora", "Medium", "Substack"
     ],
     "Automotive": [
         "Tata Motors", "Maruti", "Hyundai", "Mahindra", "Toyota", "Honda", "Ford",
@@ -61,8 +68,37 @@ KNOWN_BRANDS = {
     ],
     "General": [
         "Tata", "Reliance", "Adani", "Birla", "Mahindra", "Godrej", "Bajaj",
-        "Larsen & Toubro", "Wipro", "Infosys", "HDFC", "ICICI", "SBI", "ITC"
+        "Larsen & Toubro", "Wipro", "Infosys", "ITC"
     ]
+}
+
+# Industry-specific suffixes that indicate potential conflicts
+INDUSTRY_SUFFIXES = {
+    "Healthcare & Pharma": [
+        "kind", "plex", "zol", "cin", "mycin", "pril", "sartan", "statin",
+        "mab", "nib", "vir", "tide", "pam", "lol", "done", "ine", "ase"
+    ],
+    "Social Media & Platforms": [
+        "book", "gram", "chat", "tube", "tok", "pin", "link", "feed", "post", "snap"
+    ],
+    "Finance & Banking": [
+        "pay", "bank", "fin", "cash", "money", "credit", "loan", "fund"
+    ],
+    "Technology & Software": [
+        "soft", "tech", "cloud", "data", "ai", "app", "net", "sys", "ware"
+    ]
+}
+
+# Major brands with common suffixes - for suffix-based conflict detection
+SUFFIX_BRAND_MAP = {
+    "kind": ["Mankind"],
+    "book": ["Facebook"],
+    "gram": ["Instagram"],
+    "tube": ["YouTube"],
+    "tok": ["TikTok"],
+    "chat": ["Snapchat", "WeChat"],
+    "pay": ["PayPal", "Google Pay", "Apple Pay", "Samsung Pay"],
+    "soft": ["Microsoft"]
 }
 
 # Famous global brands to always check against (MUST MATCH server.py FAMOUS_BRANDS)
