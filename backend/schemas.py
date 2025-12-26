@@ -207,6 +207,71 @@ class Recommendation(BaseModel):
     title: str
     content: str
 
+# Trademark Research Models (for enhanced trademark analysis)
+class TrademarkConflictInfo(BaseModel):
+    """Discovered trademark conflict"""
+    name: str
+    source: str = Field(default="Web Search", description="Source of the conflict (e.g., IP India, Tofler)")
+    conflict_type: str = Field(default="trademark_application", description="Type: trademark_application, registered_company, common_law")
+    application_number: Optional[str] = None
+    status: Optional[str] = None  # REGISTERED, PENDING, OBJECTED, ABANDONED
+    owner: Optional[str] = None
+    class_number: Optional[str] = None
+    filing_date: Optional[str] = None
+    risk_level: str = Field(default="MEDIUM", description="CRITICAL, HIGH, MEDIUM, LOW")
+    details: Optional[str] = None
+    url: Optional[str] = None
+
+class CompanyConflictInfo(BaseModel):
+    """Discovered company with similar name"""
+    name: str
+    cin: Optional[str] = None  # Corporate Identification Number
+    status: str = Field(default="ACTIVE")
+    incorporation_date: Optional[str] = None
+    industry: Optional[str] = None
+    state: Optional[str] = None
+    source: str = Field(default="Company Registry")
+    risk_level: str = Field(default="MEDIUM")
+    url: Optional[str] = None
+
+class LegalPrecedentInfo(BaseModel):
+    """Relevant legal case or precedent"""
+    case_name: str
+    court: Optional[str] = None
+    year: Optional[str] = None
+    relevance: Optional[str] = None
+    key_principle: Optional[str] = None
+    url: Optional[str] = None
+
+class TrademarkResearchData(BaseModel):
+    """Complete trademark research findings"""
+    nice_classification: Optional[Dict[str, Any]] = Field(default=None, description="Nice Classification info")
+    trademark_conflicts: List[TrademarkConflictInfo] = Field(default=[], description="Discovered trademark conflicts")
+    company_conflicts: List[CompanyConflictInfo] = Field(default=[], description="Discovered company conflicts")
+    common_law_conflicts: List[Dict[str, Any]] = Field(default=[], description="Unregistered but operating businesses")
+    legal_precedents: List[LegalPrecedentInfo] = Field(default=[], description="Relevant legal cases")
+    overall_risk_score: int = Field(default=5, description="Risk score 1-10")
+    registration_success_probability: int = Field(default=50, description="Probability 0-100%")
+    opposition_probability: int = Field(default=50, description="Probability 0-100%")
+    critical_conflicts_count: int = Field(default=0)
+    high_risk_conflicts_count: int = Field(default=0)
+    total_conflicts_found: int = Field(default=0)
+
+class RegistrationTimeline(BaseModel):
+    """Trademark registration timeline and costs"""
+    estimated_duration: str = Field(default="12-18 months", description="Expected registration duration")
+    stages: List[Dict[str, str]] = Field(default=[], description="Registration stages with duration")
+    filing_cost: Optional[str] = None
+    opposition_defense_cost: Optional[str] = None
+    total_estimated_cost: Optional[str] = None
+
+class MitigationStrategy(BaseModel):
+    """Risk mitigation strategy"""
+    priority: str = Field(default="MEDIUM", description="HIGH, MEDIUM, LOW")
+    action: str
+    rationale: str
+    estimated_cost: Optional[str] = None
+
 class FinalAssessment(BaseModel):
     verdict_statement: str
     suitability_score: float
