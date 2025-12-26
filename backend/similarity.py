@@ -391,10 +391,31 @@ def check_brand_similarity(
     results["high_risk_matches"].sort(key=lambda x: x["average_similarity"], reverse=True)
     results["medium_risk_matches"].sort(key=lambda x: x["average_similarity"], reverse=True)
     
+    # NEW: Check for suffix conflicts (e.g., AuraKind vs Mankind, HeadBook vs Facebook)
+    suffix_result = check_suffix_conflict(input_name, industry, category)
+    if suffix_result["has_suffix_conflict"]:
+        for conflict in suffix_result["conflicts"]:
+            # Add to fatal conflicts
+            results["fatal_conflicts"].append({
+                "brand": conflict["brand"],
+                "match_type": "SUFFIX_CONFLICT",
+                "suffix": conflict["suffix"],
+                "levenshtein": 0,  # Not applicable for suffix match
+                "jaro_winkler": 0,
+                "fuzzy_ratio": 0,
+                "average_similarity": 0,
+                "explanation": conflict["explanation"]
+            })
+            results["should_reject"] = True
+            results["rejection_reason"] = f"FATAL: Suffix conflict - '{input_name}' shares '-{conflict['suffix']}' suffix with '{conflict['brand']}' in the same industry"
+    
     # Generate summary
     if results["fatal_conflicts"]:
         top_conflict = results["fatal_conflicts"][0]
-        results["summary"] = f"⚠️ FATAL CONFLICT: '{input_name}' matches '{top_conflict['brand']}' ({top_conflict.get('average_similarity', 100):.1f}% similarity). Immediate rejection recommended."
+        if top_conflict.get("match_type") == "SUFFIX_CONFLICT":
+            results["summary"] = f"⚠️ FATAL CONFLICT: '{input_name}' shares the '-{top_conflict.get('suffix', '')}' suffix with '{top_conflict['brand']}'. In the {category} industry, this creates unacceptable confusion risk."
+        else:
+            results["summary"] = f"⚠️ FATAL CONFLICT: '{input_name}' matches '{top_conflict['brand']}' ({top_conflict.get('average_similarity', 100):.1f}% similarity). Immediate rejection recommended."
     elif results["high_risk_matches"]:
         top_match = results["high_risk_matches"][0]
         results["summary"] = f"🔴 HIGH RISK: '{input_name}' is very similar to '{top_match['brand']}' ({top_match['average_similarity']:.1f}%). Legal review required."
