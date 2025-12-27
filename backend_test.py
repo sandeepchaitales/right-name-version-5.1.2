@@ -1249,6 +1249,352 @@ class BrandEvaluationTester:
             self.log_test("Fallback Model Feature - Exception", False, str(e))
             return False
 
+    def test_early_stopping_famous_brands(self):
+        """Test Improvement #5: Early Stopping for Famous Brands"""
+        import time
+        
+        # Test with Nike (famous brand)
+        payload = {
+            "brand_names": ["Nike"],
+            "category": "Fashion",
+            "positioning": "Premium",
+            "market_scope": "Global",
+            "countries": ["USA"]
+        }
+        
+        try:
+            print(f"\n⚡ Testing Early Stopping for Famous Brands (Improvement #5)...")
+            print(f"Testing with brand: Nike (should be immediately rejected)")
+            print(f"Expected: Response time < 5 seconds, REJECT verdict, 'IMMEDIATE REJECTION' in summary")
+            
+            start_time = time.time()
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=30  # Should be much faster than normal
+            )
+            end_time = time.time()
+            response_time = end_time - start_time
+            
+            print(f"Response Status: {response.status_code}")
+            print(f"Response Time: {response_time:.2f} seconds")
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("Early Stopping - Famous Brands HTTP", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                # Test 1: Response time should be < 5 seconds (early stopping)
+                if response_time > 5:
+                    self.log_test("Early Stopping - Response Time", False, f"Response took {response_time:.2f}s (expected < 5s)")
+                    return False
+                
+                # Test 2: Check for brand scores
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("Early Stopping - Brand Scores", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                
+                # Test 3: Verdict should be REJECT
+                verdict = brand.get("verdict", "")
+                if verdict != "REJECT":
+                    self.log_test("Early Stopping - Verdict", False, f"Expected REJECT verdict, got: {verdict}")
+                    return False
+                
+                # Test 4: Executive summary should contain "IMMEDIATE REJECTION"
+                exec_summary = data.get("executive_summary", "")
+                if "IMMEDIATE REJECTION" not in exec_summary:
+                    self.log_test("Early Stopping - Executive Summary", False, f"Expected 'IMMEDIATE REJECTION' in summary, got: {exec_summary[:100]}...")
+                    return False
+                
+                # Test 5: NameScore should be very low (< 10)
+                namescore = brand.get("namescore", 100)
+                if namescore > 10:
+                    self.log_test("Early Stopping - Low NameScore", False, f"Expected very low NameScore (< 10), got: {namescore}")
+                    return False
+                
+                print(f"✅ Early stopping test passed:")
+                print(f"   - Response time: {response_time:.2f}s (< 5s)")
+                print(f"   - Verdict: {verdict}")
+                print(f"   - NameScore: {namescore}")
+                print(f"   - Contains 'IMMEDIATE REJECTION': Yes")
+                
+                self.log_test("Early Stopping - Famous Brands", True, 
+                            f"Nike immediately rejected in {response_time:.2f}s with REJECT verdict")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("Early Stopping - JSON Parse", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Early Stopping - Timeout", False, "Request timed out (should be < 5s)")
+            return False
+        except Exception as e:
+            self.log_test("Early Stopping - Exception", False, str(e))
+            return False
+
+    def test_parallel_processing_speed(self):
+        """Test Improvement #1: Parallel Processing Speed"""
+        import time
+        
+        payload = {
+            "brand_names": ["TestSpeed123"],
+            "category": "Technology",
+            "positioning": "Premium",
+            "market_scope": "Multi-Country",
+            "countries": ["USA", "India"]
+        }
+        
+        try:
+            print(f"\n🚀 Testing Parallel Processing Speed (Improvement #1)...")
+            print(f"Testing with brand: TestSpeed123")
+            print(f"Expected: Response time 40-70 seconds (down from 90-120s)")
+            
+            start_time = time.time()
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=120  # Allow up to 2 minutes
+            )
+            end_time = time.time()
+            response_time = end_time - start_time
+            
+            print(f"Response Status: {response.status_code}")
+            print(f"Response Time: {response_time:.2f} seconds")
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("Parallel Processing - HTTP Error", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                # Test 1: Response time should be 40-70 seconds (improved from 90-120s)
+                if response_time > 80:
+                    self.log_test("Parallel Processing - Speed Improvement", False, 
+                                f"Response took {response_time:.2f}s (expected 40-70s, was 90-120s before)")
+                    return False
+                
+                if response_time < 20:
+                    print(f"Warning: Response very fast ({response_time:.2f}s) - may indicate caching or early stopping")
+                
+                # Test 2: Check for valid response structure
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("Parallel Processing - Response Structure", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                
+                # Test 3: Check that all expected data sections are present (indicating parallel processing worked)
+                expected_sections = ["domain_analysis", "trademark_research", "visibility_analysis"]
+                missing_sections = [section for section in expected_sections if section not in brand]
+                
+                if missing_sections:
+                    self.log_test("Parallel Processing - Data Completeness", False, 
+                                f"Missing data sections (parallel processing may have failed): {missing_sections}")
+                    return False
+                
+                # Test 4: Check brand name matches
+                if brand.get("brand_name") != "TestSpeed123":
+                    self.log_test("Parallel Processing - Brand Name", False, 
+                                f"Expected 'TestSpeed123', got '{brand.get('brand_name')}'")
+                    return False
+                
+                print(f"✅ Parallel processing test passed:")
+                print(f"   - Response time: {response_time:.2f}s (target: 40-70s)")
+                print(f"   - All data sections present: {expected_sections}")
+                print(f"   - Speed improvement: {max(0, 90 - response_time):.1f}s faster than old sequential method")
+                
+                self.log_test("Parallel Processing - Speed Test", True, 
+                            f"Response in {response_time:.2f}s with complete data (target: 40-70s)")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("Parallel Processing - JSON Parse", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Parallel Processing - Timeout", False, "Request timed out after 120 seconds")
+            return False
+        except Exception as e:
+            self.log_test("Parallel Processing - Exception", False, str(e))
+            return False
+
+    def test_new_form_fields(self):
+        """Test Improvements #2 & #3: New Form Fields (competitors and keywords)"""
+        payload = {
+            "brand_names": ["PayQuick"],
+            "known_competitors": ["PhonePe", "Paytm", "GooglePay"],
+            "product_keywords": ["UPI", "wallet", "payments"],
+            "category": "Fintech",
+            "industry": "Finance",
+            "countries": ["India"]
+        }
+        
+        try:
+            print(f"\n📝 Testing New Form Fields (Improvements #2 & #3)...")
+            print(f"Testing with brand: PayQuick")
+            print(f"Known competitors: {payload['known_competitors']}")
+            print(f"Product keywords: {payload['product_keywords']}")
+            print(f"Expected: Competitor conflicts detected")
+            
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=120
+            )
+            
+            print(f"Response Status: {response.status_code}")
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("New Form Fields - HTTP Error", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                # Test 1: Check for valid response structure
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("New Form Fields - Response Structure", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                
+                # Test 2: Check brand name matches
+                if brand.get("brand_name") != "PayQuick":
+                    self.log_test("New Form Fields - Brand Name", False, 
+                                f"Expected 'PayQuick', got '{brand.get('brand_name')}'")
+                    return False
+                
+                # Test 3: Check if known competitors are mentioned in the response
+                response_text = json.dumps(data).lower()
+                competitors_found = []
+                for competitor in payload['known_competitors']:
+                    if competitor.lower() in response_text:
+                        competitors_found.append(competitor)
+                
+                if len(competitors_found) < 2:  # At least 2 out of 3 competitors should be mentioned
+                    self.log_test("New Form Fields - Competitor Detection", False, 
+                                f"Expected competitors not found in analysis. Found: {competitors_found}")
+                    return False
+                
+                # Test 4: Check if product keywords are utilized
+                keywords_found = []
+                for keyword in payload['product_keywords']:
+                    if keyword.lower() in response_text:
+                        keywords_found.append(keyword)
+                
+                if len(keywords_found) < 2:  # At least 2 out of 3 keywords should be mentioned
+                    self.log_test("New Form Fields - Keyword Utilization", False, 
+                                f"Expected keywords not found in analysis. Found: {keywords_found}")
+                    return False
+                
+                print(f"✅ New form fields test passed:")
+                print(f"   - Competitors found in analysis: {competitors_found}")
+                print(f"   - Keywords found in analysis: {keywords_found}")
+                
+                self.log_test("New Form Fields - Competitors & Keywords", True, 
+                            f"Competitors detected: {competitors_found}, Keywords used: {keywords_found}")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("New Form Fields - JSON Parse", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("New Form Fields - Timeout", False, "Request timed out after 120 seconds")
+            return False
+        except Exception as e:
+            self.log_test("New Form Fields - Exception", False, str(e))
+            return False
+
+    def test_play_store_error_handling(self):
+        """Test Improvement #4: Play Store Error Handling"""
+        payload = {
+            "brand_names": ["PlayStoreTest"],
+            "category": "Mobile App",
+            "positioning": "Premium",
+            "market_scope": "Global",
+            "countries": ["USA", "India"]
+        }
+        
+        try:
+            print(f"\n🛡️ Testing Play Store Error Handling (Improvement #4)...")
+            print(f"Testing with brand: PlayStoreTest")
+            print(f"Expected: No crashes, graceful error handling")
+            
+            response = requests.post(
+                f"{self.api_url}/evaluate", 
+                json=payload, 
+                headers={'Content-Type': 'application/json'},
+                timeout=120
+            )
+            
+            print(f"Response Status: {response.status_code}")
+            
+            # Test 1: API should not crash (should return 200, not 500/502)
+            if response.status_code in [500, 502, 503]:
+                self.log_test("Play Store Error Handling - Server Crash", False, 
+                            f"Server crashed with {response.status_code} (should handle errors gracefully)")
+                return False
+            
+            if response.status_code != 200:
+                error_msg = f"HTTP {response.status_code}: {response.text[:300]}"
+                self.log_test("Play Store Error Handling - HTTP Error", False, error_msg)
+                return False
+            
+            try:
+                data = response.json()
+                
+                # Test 2: Check for valid response structure (no crashes)
+                if not data.get("brand_scores") or len(data["brand_scores"]) == 0:
+                    self.log_test("Play Store Error Handling - Response Structure", False, "No brand scores returned")
+                    return False
+                
+                brand = data["brand_scores"][0]
+                
+                # Test 3: Check brand name matches
+                if brand.get("brand_name") != "PlayStoreTest":
+                    self.log_test("Play Store Error Handling - Brand Name", False, 
+                                f"Expected 'PlayStoreTest', got '{brand.get('brand_name')}'")
+                    return False
+                
+                # Test 4: Check for reasonable verdict (not error state)
+                verdict = brand.get("verdict", "")
+                if verdict not in ["APPROVE", "CAUTION", "REJECT", "GO"]:
+                    self.log_test("Play Store Error Handling - Valid Verdict", False, 
+                                f"Invalid verdict: {verdict} (should have valid verdict despite errors)")
+                    return False
+                
+                print(f"✅ Play Store error handling test passed:")
+                print(f"   - No server crashes detected")
+                print(f"   - Analysis completed with verdict: {verdict}")
+                
+                self.log_test("Play Store Error Handling", True, 
+                            f"No crashes, graceful error handling, analysis completed with {verdict} verdict")
+                return True
+                
+            except json.JSONDecodeError as e:
+                self.log_test("Play Store Error Handling - JSON Parse", False, f"Invalid JSON response: {str(e)}")
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Play Store Error Handling - Timeout", False, "Request timed out after 120 seconds")
+            return False
+        except Exception as e:
+            self.log_test("Play Store Error Handling - Exception", False, str(e))
+            return False
+
     def test_score_impact_validation_fix(self):
         """Test the score_impact validation fix with TestFix brand"""
         payload = {
