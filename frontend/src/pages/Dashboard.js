@@ -188,18 +188,6 @@ const SubSectionHeader = ({ icon: Icon, title, color = "slate" }) => (
 
 // ============ COVER PAGE ============
 const CoverPage = ({ brandName, score, verdict, date, query, reportId }) => {
-    // Format countries for display
-    const formatCountries = (countries) => {
-        if (!countries || countries.length === 0) return 'Not specified';
-        const countryFlags = {
-            'USA': '🇺🇸', 'United States': '🇺🇸', 'India': '🇮🇳', 'UK': '🇬🇧', 'United Kingdom': '🇬🇧',
-            'Germany': '🇩🇪', 'France': '🇫🇷', 'Canada': '🇨🇦', 'Australia': '🇦🇺', 'Japan': '🇯🇵',
-            'China': '🇨🇳', 'Singapore': '🇸🇬', 'UAE': '🇦🇪', 'Brazil': '🇧🇷', 'Mexico': '🇲🇽',
-            'Italy': '🇮🇹', 'Spain': '🇪🇸', 'South Korea': '🇰🇷', 'Netherlands': '🇳🇱', 'Switzerland': '🇨🇭'
-        };
-        return countries.map(c => `${countryFlags[c] || '🌍'} ${c}`).join(', ');
-    };
-
     return (
         <div className="hidden print:flex print:flex-col print:min-h-screen print:items-center print:justify-center print:bg-white print:p-12">
             <div className="text-center">
@@ -215,7 +203,17 @@ const CoverPage = ({ brandName, score, verdict, date, query, reportId }) => {
                     </div>
                 </div>
                 <div className="text-slate-500 space-y-2">
-                    <p className="text-lg">{query?.category} • {formatCountries(query?.countries)}</p>
+                    <p className="text-lg flex items-center justify-center gap-2 flex-wrap">
+                        <span>{query?.category}</span>
+                        <span>•</span>
+                        {query?.countries?.map((country, idx) => (
+                            <span key={idx} className="inline-flex items-center gap-1">
+                                <CountryMapIcon country={country} className="w-5 h-4 text-slate-600" />
+                                <span>{country}</span>
+                                {idx < query.countries.length - 1 && <span>,</span>}
+                            </span>
+                        ))}
+                    </p>
                     <p className="flex items-center justify-center gap-2">
                         <Calendar className="w-4 h-4" />{date}
                     </p>
