@@ -261,7 +261,16 @@ const CoverPage = ({ brandName, score, verdict, date, query, reportId }) => {
                             </tr>
                             <tr>
                                 <td className="px-4 py-2 text-slate-500 font-medium">Target Countries</td>
-                                <td className="px-4 py-2 text-slate-900 font-semibold text-right">{formatCountries(query?.countries)}</td>
+                                <td className="px-4 py-2 text-slate-900 font-semibold text-right">
+                                    <span className="flex items-center justify-end gap-2 flex-wrap">
+                                        {query?.countries?.map((country, idx) => (
+                                            <span key={idx} className="inline-flex items-center gap-1">
+                                                <CountryMapIcon country={country} className="w-4 h-3 text-slate-600" />
+                                                <span>{country}</span>
+                                            </span>
+                                        )) || 'Not specified'}
+                                    </span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -273,17 +282,6 @@ const CoverPage = ({ brandName, score, verdict, date, query, reportId }) => {
 
 // ============ INPUT SUMMARY SECTION (For Screen View) ============
 const InputSummarySection = ({ query, brandName, reportId, date }) => {
-    const formatCountries = (countries) => {
-        if (!countries || countries.length === 0) return 'Not specified';
-        const countryFlags = {
-            'USA': '🇺🇸', 'United States': '🇺🇸', 'India': '🇮🇳', 'UK': '🇬🇧', 'United Kingdom': '🇬🇧',
-            'Germany': '🇩🇪', 'France': '🇫🇷', 'Canada': '🇨🇦', 'Australia': '🇦🇺', 'Japan': '🇯🇵',
-            'China': '🇨🇳', 'Singapore': '🇸🇬', 'UAE': '🇦🇪', 'Brazil': '🇧🇷', 'Mexico': '🇲🇽',
-            'Italy': '🇮🇹', 'Spain': '🇪🇸', 'South Korea': '🇰🇷', 'Netherlands': '🇳🇱', 'Switzerland': '🇨🇭'
-        };
-        return countries.map(c => `${countryFlags[c] || '🌍'} ${c}`).join(', ');
-    };
-
     return (
         <PrintCard>
             <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border border-slate-200 overflow-hidden">
