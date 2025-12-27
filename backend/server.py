@@ -1084,7 +1084,7 @@ async def evaluate_brands(request: BrandEvaluationRequest):
                 reason = rejection_info.get("reason", "Existing brand detected")
             
             # Determine detection method
-            detection_method = "Dynamic Web Search" if brand in dynamic_rejections else "Famous Brand List"
+            detection_method = "Dynamic Competitor Search"
             
             brand_scores.append(BrandScore(
                 brand_name=brand,
