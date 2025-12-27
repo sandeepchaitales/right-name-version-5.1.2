@@ -135,15 +135,9 @@ const CoverPage = ({ brandName, score, verdict, date, query, reportId }) => {
                     </div>
                 </div>
                 <div className="text-slate-500 space-y-2">
-                    <p className="text-lg flex items-center justify-center gap-2 flex-wrap">
-                        <span>{query?.category}</span>
-                        <span>•</span>
-                        {query?.countries?.map((country, idx) => (
-                            <span key={idx} className="inline-flex items-center gap-1">
-                                <CountryMapIcon country={country} className="w-5 h-4 text-slate-600" />
-                                <span>{country}</span>
-                                {idx < query.countries.length - 1 && <span>,</span>}
-                            </span>
+                    <p className="text-lg">
+                        {query?.category} • {query?.countries?.map((c, i) => (
+                            <span key={i}>{getCountryFlag(c)} {c}{i < query.countries.length - 1 ? ', ' : ''}</span>
                         ))}
                     </p>
                     <p className="flex items-center justify-center gap-2">
