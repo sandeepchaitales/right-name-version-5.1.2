@@ -913,9 +913,10 @@ async def evaluate_brands(request: BrandEvaluationRequest):
     parallel_start = time_module.time()
     
     async def gather_domain_data(brand):
-        """Check primary domain availability"""
+        """Check primary domain availability - wrapped for async"""
         try:
-            return check_domain_availability(brand)
+            # Run synchronous whois check in thread pool
+            return await asyncio.to_thread(check_domain_availability, brand)
         except Exception as e:
             logging.error(f"Domain check failed for {brand}: {e}")
             return f"{brand}.com: CHECK FAILED (Error: {str(e)})"
