@@ -769,10 +769,15 @@ def check_famous_brand(brand_name: str) -> dict:
     
     phonetic_input = phonetic_normalize(normalized_clean)
     
+    # IMPROVEMENT: Also create de-pluralized version (remove trailing 's')
+    normalized_singular = normalized_clean.rstrip('s') if len(normalized_clean) > 3 else normalized_clean
+    normalized_dedupe_singular = normalized_dedupe.rstrip('s') if len(normalized_dedupe) > 3 else normalized_dedupe
+    
     for famous in FAMOUS_BRANDS:
         famous_clean = famous.replace(" ", "").replace("-", "")
         famous_dedupe = re.sub(r'(.)\1+', r'\1', famous_clean)
         famous_phonetic = phonetic_normalize(famous_clean)
+        famous_singular = famous_clean.rstrip('s') if len(famous_clean) > 3 else famous_clean
         
         # Direct match after normalization
         if normalized_clean == famous_clean:
@@ -782,12 +787,28 @@ def check_famous_brand(brand_name: str) -> dict:
                 "reason": f"'{brand_name}' matches the famous brand '{famous.title()}'. This name is legally protected."
             }
         
+        # PLURALIZATION CHECK: "moneycontrols" matches "moneycontrol"
+        if normalized_singular == famous_clean or normalized_clean == famous_singular:
+            return {
+                "is_famous": True,
+                "matched_brand": famous.title(),
+                "reason": f"'{brand_name}' is a plural/singular variation of the famous brand '{famous.title()}'. This name will cause trademark conflicts."
+            }
+        
         # Match after removing doubled letters (ludokingg -> ludoking)
         if normalized_dedupe == famous_dedupe:
             return {
                 "is_famous": True,
                 "matched_brand": famous.title(),
                 "reason": f"'{brand_name}' is a variation of the famous brand '{famous.title()}' (letter doubling detected). This name will cause trademark conflicts."
+            }
+        
+        # PLURALIZATION + DEDUPE CHECK
+        if normalized_dedupe_singular == famous_dedupe or normalized_dedupe == famous_singular:
+            return {
+                "is_famous": True,
+                "matched_brand": famous.title(),
+                "reason": f"'{brand_name}' is a variation of the famous brand '{famous.title()}'. This name will cause trademark conflicts."
             }
         
         # PHONETIC MATCH - key fix for mobiqwik vs mobikwik
