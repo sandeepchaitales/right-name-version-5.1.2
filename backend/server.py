@@ -665,6 +665,9 @@ FAMOUS_BRANDS = {
     "dream11", "mpl", "winzo", "paytm first games", "games24x7", "rummy circle",
     "call of duty mobile", "cod mobile", "asphalt", "real racing", "hill climb racing",
     "wordle", "chess.com", "lichess", "bgmi", "battlegrounds mobile india",
+    # CRITICAL ADDITION: Ludo Star and variants
+    "ludo star", "ludostar", "ludo staar", "ludo starr", "ludostaar", "ludostarr",
+    "gameberry", "gameberry labs",
     # Automotive
     "tesla", "ford", "gm", "chevrolet", "toyota", "honda", "bmw", "mercedes", "audi",
     "volkswagen", "porsche", "ferrari", "lamborghini", "bentley", "rolls royce", "jaguar",
