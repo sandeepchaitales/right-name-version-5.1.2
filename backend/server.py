@@ -691,6 +691,12 @@ FAMOUS_BRANDS = {
     "chase", "bank of america", "wells fargo", "citibank", "goldman sachs", "morgan stanley",
     "phonepe", "paytm", "google pay", "gpay", "razorpay", "cred", "groww", "zerodha", "upstox",
     "mobikwik", "freecharge", "bhim", "amazon pay", "airtel money", "jio money", "ola money",
+    # Indian Finance/Stock Market Apps (CRITICAL)
+    "moneycontrol", "money control", "et markets", "etmarkets", "economic times",
+    "ticker tape", "tickertape", "smallcase", "kite", "kite zerodha", "coin", "varsity",
+    "angel one", "angelone", "angel broking", "5paisa", "iifl", "motilal oswal", 
+    "hdfc securities", "icici direct", "kotak securities", "sharekhan", "nse", "bse",
+    "sensex", "nifty", "mint", "livemint", "bloomberg", "reuters", "cnbc",
     # Beauty & Personal Care
     "loreal", "maybelline", "mac", "sephora", "ulta", "estee lauder", "clinique",
     "neutrogena", "dove", "pantene", "head shoulders", "gillette", "olay",
