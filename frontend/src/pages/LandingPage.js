@@ -377,7 +377,8 @@ const LandingPage = () => {
             {/* Navigation Links */}
             <nav className="hidden md:flex items-center gap-6">
               <Link to="/" className="text-sm font-semibold text-violet-600">Home</Link>
-              <Link to="/pricing" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">Pricing</Link>
+              <a href="#features" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">Features</a>
+              <a href="#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">How It Works</a>
               <Link to="/blog" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">Blog</Link>
               <a href="#faq" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">FAQ</a>
             </nav>
