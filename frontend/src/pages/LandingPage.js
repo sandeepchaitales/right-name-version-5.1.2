@@ -356,14 +356,25 @@ const LandingPage = () => {
 
       <div className="relative max-w-7xl mx-auto px-6 py-8 lg:py-12">
         
-        {/* Header */}
+        {/* Header with Navigation */}
         <div className="flex justify-between items-center mb-12 lg:mb-16">
             <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-600 via-fuchsia-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl shadow-violet-300/50 hover:scale-110 transition-transform cursor-pointer">
-                    <Sparkles className="w-7 h-7 text-white" />
-                </div>
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_name-radar-1/artifacts/a4ppykdi_RIGHTNAME.AI.png" 
+                  alt="RIGHTNAME Logo" 
+                  className="w-12 h-12 rounded-2xl shadow-xl shadow-violet-300/50 hover:scale-110 transition-transform cursor-pointer"
+                />
                 <h1 className="text-2xl lg:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-fuchsia-500 to-orange-500 tracking-tight">RIGHTNAME</h1>
             </div>
+            
+            {/* Navigation Links */}
+            <nav className="hidden md:flex items-center gap-6">
+              <Link to="/" className="text-sm font-semibold text-violet-600">Home</Link>
+              <Link to="/pricing" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">Pricing</Link>
+              <Link to="/blog" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">Blog</Link>
+              <a href="#faq" className="text-sm font-semibold text-slate-600 hover:text-violet-600 transition-colors">FAQ</a>
+            </nav>
+            
             <div className="flex items-center gap-3">
                 {authLoading ? (
                     <div className="w-10 h-10 rounded-full bg-slate-100 animate-pulse" />
