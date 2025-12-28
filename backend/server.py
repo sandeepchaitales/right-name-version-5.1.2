@@ -744,20 +744,24 @@ async def dynamic_brand_search(brand_name: str, category: str = "") -> dict:
         
         llm = LlmChat(EMERGENT_KEY, "openai", "gpt-4o-mini")  # Use mini for speed/cost
         
-        prompt = f"""You are a trademark and brand expert. Analyze this brand name for conflicts.
+        prompt = f"""You are a trademark and brand expert with STRICT conflict detection. Analyze this brand name for conflicts.
 
 BRAND NAME: {brand_name}
 CATEGORY: {category or 'General'}
 TARGET MARKET: India, USA, Global
 
-TASK: Is this brand name identical or confusingly similar to ANY existing brand, company, app, product, or trademark?
+TASK: Determine if this brand name is identical or CONFUSINGLY SIMILAR to ANY existing brand, company, app, product, or trademark.
 
-Consider:
-1. Exact matches (same name)
-2. Phonetic similarity (sounds the same)
-3. Spelling variations (extra letters, typos)
-4. Regional brands (Indian newspapers, local apps, etc.)
-5. Global brands (tech companies, apps, etc.)
+⚠️ STRICT CONFLICT RULES - Flag as conflict if ANY of these apply:
+1. EXACT MATCH: Same name (case-insensitive)
+2. PLURALIZATION: Adding/removing 's' (MoneyControls = Moneycontrol, Bumbles = Bumble)
+3. PHONETIC SIMILARITY: Sounds similar when spoken (BUMBELL ≈ Bumble, Googel ≈ Google)
+4. LETTER VARIATIONS: Extra/missing letters (Nikee = Nike, Facebok = Facebook)
+5. SPACING CHANGES: With/without spaces (FaceBook = Facebook, Money Control = Moneycontrol)
+6. REGIONAL BRANDS: Indian apps, newspapers, businesses (Moneycontrol, Andhra Jyothi, Swiggy, etc.)
+7. GLOBAL BRANDS: Tech companies, apps, products
+
+IMPORTANT: When in doubt, FLAG AS CONFLICT. Better to be overly cautious than miss a trademark issue.
 
 RESPOND IN THIS EXACT JSON FORMAT:
 {{
@@ -769,10 +773,11 @@ RESPOND IN THIS EXACT JSON FORMAT:
     "brand_info": "What is the conflicting brand (1 sentence)"
 }}
 
-Examples:
+Examples (BE STRICT LIKE THESE):
+- "MoneyControls" in "Finance" → {{"has_conflict": true, "confidence": "HIGH", "conflicting_brand": "Moneycontrol", "similarity_percentage": 98, "reason": "Pluralized version of Moneycontrol - India's #1 finance app", "brand_info": "Moneycontrol is India's leading financial information platform"}}
 - "AndhraJyoothi" in "News" → {{"has_conflict": true, "confidence": "HIGH", "conflicting_brand": "Andhra Jyothi", "similarity_percentage": 98, "reason": "Phonetically identical to famous Telugu newspaper", "brand_info": "Andhra Jyothi is a major Telugu daily newspaper in India"}}
-- "BUMBELL" in "Dating" → {{"has_conflict": true, "confidence": "HIGH", "conflicting_brand": "Bumble", "similarity_percentage": 94, "reason": "Phonetically similar to Bumble dating app", "brand_info": "Bumble is a popular dating app"}}
-- "UniqueXYZ123" in "Finance" → {{"has_conflict": false, "confidence": "HIGH", "conflicting_brand": null, "similarity_percentage": 0, "reason": "No known brand with this name", "brand_info": null}}
+- "BUMBELL" in "Dating" → {{"has_conflict": true, "confidence": "HIGH", "conflicting_brand": "Bumble", "similarity_percentage": 94, "reason": "Phonetically similar to Bumble dating app", "brand_info": "Bumble is a popular dating/social networking app"}}
+- "Zyntrix2025" in "Finance" → {{"has_conflict": false, "confidence": "HIGH", "conflicting_brand": null, "similarity_percentage": 0, "reason": "Completely unique invented name with no known matches", "brand_info": null}}
 
 NOW ANALYZE: "{brand_name}" in "{category or 'General'}"
 Return ONLY the JSON, no other text."""
