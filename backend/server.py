@@ -718,12 +718,13 @@ FAMOUS_BRANDS = {
 
 async def dynamic_brand_search(brand_name: str, category: str = "") -> dict:
     """
-    LLM-FIRST BRAND CONFLICT DETECTION
+    LLM-FIRST BRAND CONFLICT DETECTION + WEB VERIFICATION
     
-    Use GPT-4o's knowledge to detect brand conflicts - NO STATIC LISTS!
-    The LLM knows millions of brands, let it do the work.
+    1. First do a quick web search to check if brand exists
+    2. Then use GPT-4o to analyze conflicts
     """
     import re
+    import aiohttp
     
     print(f"🔍 LLM BRAND CHECK: '{brand_name}' in category '{category}'", flush=True)
     logging.warning(f"🔍 LLM BRAND CHECK: '{brand_name}' in category '{category}'")
@@ -736,6 +737,55 @@ async def dynamic_brand_search(brand_name: str, category: str = "") -> dict:
         "reason": ""
     }
     
+    # ========== STEP 1: WEB SEARCH TO CHECK IF BRAND EXISTS ==========
+    web_evidence = []
+    brand_found_online = False
+    
+    try:
+        search_query = f'"{brand_name}" {category} official site OR company OR brand'
+        search_url = f"https://www.bing.com/search?q={search_query.replace(' ', '+')}"
+        
+        async with aiohttp.ClientSession() as session:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+            async with session.get(search_url, headers=headers, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    html = await response.text()
+                    html_lower = html.lower()
+                    brand_lower = brand_name.lower().replace(" ", "")
+                    
+                    # Check for strong indicators the brand exists
+                    existence_signals = [
+                        f"{brand_lower}.com",
+                        f"{brand_lower}.in",
+                        f"@{brand_lower}",
+                        f"{brand_name.lower()} official",
+                        f"{brand_name.lower()} - home",
+                        f"about {brand_name.lower()}",
+                        f"{brand_name.lower()} franchise",
+                        f"{brand_name.lower()} stores",
+                        f"{brand_name.lower()} outlets",
+                        f"{brand_name.lower()} locations",
+                        f"{brand_name.lower()} menu",
+                        f"{brand_name.lower()} cafe",
+                        f"{brand_name.lower()} restaurant",
+                    ]
+                    
+                    found_signals = []
+                    for signal in existence_signals:
+                        if signal in html_lower:
+                            found_signals.append(signal)
+                    
+                    if len(found_signals) >= 2:
+                        brand_found_online = True
+                        web_evidence = found_signals[:3]
+                        print(f"🌐 WEB SEARCH: Found '{brand_name}' online! Signals: {found_signals[:3]}", flush=True)
+                        logging.warning(f"🌐 WEB SEARCH: Found '{brand_name}' online! Signals: {found_signals[:3]}")
+    except Exception as e:
+        logging.error(f"Web search failed for {brand_name}: {e}")
+    
+    # ========== STEP 2: LLM CHECK ==========
     # Use LLM to check for brand conflicts
     try:
         if not LlmChat or not EMERGENT_KEY:
